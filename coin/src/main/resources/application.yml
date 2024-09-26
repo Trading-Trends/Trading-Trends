@@ -1,0 +1,13 @@
+server:
+  port: 19093
+
+spring:
+  application:
+    name: coin
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:19090/eureka/
+
+

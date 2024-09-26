@@ -1,11 +1,10 @@
-package com.tradingtrends.gateway;
+package com.tradingtrends.common;
 
-import com.tradingtrends.common.CommonApplication;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class GatewayApplication {
+public class CommonApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(CommonApplication.class, args);

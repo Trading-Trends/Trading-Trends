@@ -30,14 +30,34 @@ subprojects {
 
 	repositories {
 		mavenCentral()
+		maven { url "https://repo.spring.io/release" }
 	}
-
 	dependencies {
 
+		if (project.name != 'common') {
+			implementation project(':common')
+		}
+		if (!(project.name in ['eureka', 'gateway'])){
+			implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+			runtimeOnly 'org.postgresql:postgresql'
+			compileOnly 'org.projectlombok:lombok'
+			annotationProcessor 'org.projectlombok:lombok'
+		}
+		if (project.name in ['coin', 'corporate', 'notification', 'stock', 'user']) {
+
+			implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
+			implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
+
+		}
+
 		implementation 'org.springframework.boot:spring-boot-starter-web'
-		compileOnly 'org.projectlombok:lombok'
-		annotationProcessor 'org.projectlombok:lombok'
+		implementation 'org.springframework.kafka:spring-kafka'
+		implementation 'org.springframework.boot:spring-boot-starter-data-elasticsearch'
+		implementation 'org.springframework.boot:spring-boot-starter-actuator'
+		runtimeOnly 'io.micrometer:micrometer-registry-prometheus'
+
 		testImplementation 'org.springframework.boot:spring-boot-starter-test'
+		testImplementation 'org.springframework.kafka:spring-kafka-test'
 		testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 	}
 

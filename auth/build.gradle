@@ -22,9 +22,9 @@ ext {
 }
 
 dependencies {
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	testImplementation 'io.projectreactor:reactor-test'
-	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+	//Redis
+	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+	implementation 'org.springframework.boot:spring-boot-starter-cache'
 }
 
 dependencyManagement {

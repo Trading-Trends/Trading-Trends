@@ -1,11 +1,11 @@
-package com.tradingtrends.gateway;
+package com.tradingtrends.eureka;
 
 import com.tradingtrends.common.CommonApplication;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class GatewayApplication {
+public class EurekaApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(CommonApplication.class, args);
