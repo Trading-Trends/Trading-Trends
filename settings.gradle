@@ -1,0 +1,12 @@
+rootProject.name = 'tradingtrends'
+
+include 'eureka'
+include 'gateway'
+include 'auth'
+include 'batch'
+include 'common'
+include 'user'
+include 'corporate'
+include 'stock'
+include 'coin'
+include 'notification'
