@@ -8,7 +8,7 @@ spring:
   data:
     redis:
       host: localhost   # Docker를 사용할 경우 컨테이너 이름으로도 가능 (예: redis-stack-compose)
-      port: 25439
+      port: 26379
       password: systempass  # 실제 비밀번호로 교체
 
 service:

@@ -3,8 +3,8 @@ package com.tradingtrends.auth.application;
 import com.tradingtrends.auth.application.dto.AuthResponse;
 import com.tradingtrends.auth.infrastructure.client.UserClient;
 import com.tradingtrends.auth.infrastructure.client.UserResponse;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import feign.FeignException;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,6 +26,9 @@ public class AuthService {
     @Value("${service.jwt.access-expiration}")
     private Long accessExpiration;
 
+    @Value("${service.jwt.refresh-expiration}")
+    private Long refreshExpiration;
+
     private final SecretKey secretKey;
 
     public AuthService(UserClient userClient, @Value("${service.jwt.secret-key}") String secretKey, PasswordEncoder passwordEncoder) {
@@ -35,18 +38,28 @@ public class AuthService {
     }
 
     public AuthResponse createAccessToken(final String userId, final String rawPassword) {
-        // UserClient를 사용해 회원 정보를 조회하고 유효한 회원인지 확인
-        UserResponse user = userClient.getUserById(userId);
-        if (user == null) {
-            throw new RuntimeException("유저가 존재하지 않습니다.");
-        }
+        UserResponse user = retrieveUser(userId);
+        validatePassword(rawPassword, user.getPassword());
+        return generateAccessToken(user);
+    }
 
-        // 입력된 비밀번호와 저장된 암호화된 비밀번호를 비교
-        if (!passwordEncoder.matches(rawPassword, user.getPassword())) {
+    private UserResponse retrieveUser(final String userId) throws RuntimeException {
+        try {
+            return userClient.getUserById(userId);
+        } catch (FeignException.NotFound e) {
+            throw new RuntimeException("유저가 존재하지 않습니다.");
+        } catch (FeignException e) {
+            throw new RuntimeException("유저 정보 조회 중 문제가 발생했습니다: " + e.getMessage());
+        }
+    }
+
+    private void validatePassword(final String rawPassword, final String encryptedPassword) throws RuntimeException {
+        if (!passwordEncoder.matches(rawPassword, encryptedPassword)) {
             throw new RuntimeException("비밀번호가 일치하지 않습니다.");
         }
+    }
 
-        // 비밀번호가 일치하면 JWT 토큰 생성
+    private AuthResponse generateAccessToken(final UserResponse user) {
         return AuthResponse.of(Jwts.builder()
                 .claim("user_id", user.getUserId())
                 .claim("email", user.getEmail())
@@ -58,9 +71,47 @@ public class AuthService {
                 .compact());
     }
 
+    public AuthResponse createRefreshToken(final String userId) {
+        UserResponse user = retrieveUser(userId);
+        return generateRefreshToken(user);
+    }
 
-    // 회원 존재 여부 검증 로직
+    private AuthResponse generateRefreshToken(final UserResponse user) {
+        return AuthResponse.of(Jwts.builder()
+                .claim("user_id", user.getUserId())
+                .claim("email", user.getEmail())
+                .claim("role", user.getRole())
+                .issuer(issuer)
+                .issuedAt(new Date(System.currentTimeMillis()))
+                .expiration(new Date(System.currentTimeMillis() + refreshExpiration))
+                .signWith(secretKey, SignatureAlgorithm.HS512)
+                .compact());
+    }
+
+    public AuthResponse refreshAccessToken(final String refreshToken) {
+        Jws<Claims> claims = parseToken(refreshToken);
+        String userId = claims.getBody().get("user_id", String.class);
+        UserResponse user = retrieveUser(userId);
+        return generateAccessToken(user);
+    }
+
+    private Jws<Claims> parseToken(final String token) {
+        try {
+            return Jwts.parser()  // parser() 대신 parserBuilder() 사용
+                    .setSigningKey(secretKey)  // 시그니처 키 설정
+                    .build()  // 빌드 메서드로 파서 인스턴스 생성
+                    .parseClaimsJws(token);  // 토큰을 파싱
+        } catch (JwtException e) {
+            throw new RuntimeException("유효하지 않은 토큰입니다.");
+        }
+    }
+
+
     public Boolean verifyUser(final String userId) {
-        return userClient.verifyUser(userId);
+        try {
+            return userClient.verifyUser(userId);
+        } catch (Exception e) {
+            throw new RuntimeException("유저 검증 중 문제가 발생했습니다: " + e.getMessage());
+        }
     }
 }

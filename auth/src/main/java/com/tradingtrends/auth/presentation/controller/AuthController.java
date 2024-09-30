@@ -27,17 +27,33 @@ public class AuthController {
         return createResponse(ResponseEntity.ok(response));
     }
 
-    // userId 존재여부 검증 API 입니다.
+    // userId 존재여부 검증 API
     @GetMapping("/verify")
     public ResponseEntity<Boolean> verifyUser(@RequestParam("user_id") String userId) {
         Boolean response = authService.verifyUser(userId);
         return createResponse(ResponseEntity.ok(response));
     }
 
-    // Response Header 에 `Server-Port` 룰 추가해주는 Generic 함수입니다.
+    // Refresh Token 생성 API
+    @PostMapping("/refresh-token")
+    public ResponseEntity<AuthResponse> createRefreshToken(@RequestParam("user_id") String userId) {
+        AuthResponse response = authService.createRefreshToken(userId);
+        return createResponse(ResponseEntity.ok(response));
+    }
+
+    // Access Token 재발행 API
+    @PostMapping("/refresh-access-token")
+    public ResponseEntity<AuthResponse> refreshAccessToken(@RequestHeader("Authorization") String refreshToken) {
+        // "Bearer " 접두사를 제외한 토큰 값만 추출
+        String token = refreshToken.replace("Bearer ", "");
+        AuthResponse response = authService.refreshAccessToken(token);
+        return createResponse(ResponseEntity.ok(response));
+    }
+
+    // Response Header에 `Server-Port` 추가해주는 함수
     private <T> ResponseEntity<T> createResponse(ResponseEntity<T> response) {
-        HttpHeaders headers = HttpHeaders.writableHttpHeaders(response.getHeaders()); // 인자로 받은 헤더의 정보를 수정할 수 있도록 불러옵니다.
-        headers.add("Server-Port", serverPort); // Response Header 에 Server-Port 키값을 추가합니다.
-        return new ResponseEntity<>(response.getBody(), headers, response.getStatusCode()); // 인자로 받은 값에 수정한 헤더만 적용하여 응답합니다.
+        HttpHeaders headers = HttpHeaders.writableHttpHeaders(response.getHeaders());
+        headers.add("Server-Port", serverPort);
+        return new ResponseEntity<>(response.getBody(), headers, response.getStatusCode());
     }
 }
