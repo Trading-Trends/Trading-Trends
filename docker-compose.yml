@@ -11,7 +11,7 @@ services:
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: postgres
+      POSTGRES_DB: tradingtrends
   redis:
     image: 'redis:latest'  # Redis 이미지 사용
     hostname: redis
