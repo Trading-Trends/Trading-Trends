@@ -37,18 +37,18 @@ subprojects {
 		if (project.name != 'common') {
 			implementation project(':common')
 		}
-		if (!(project.name in ['eureka', 'gateway'])){
-			implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-			runtimeOnly 'org.postgresql:postgresql'
-			compileOnly 'org.projectlombok:lombok'
-			annotationProcessor 'org.projectlombok:lombok'
-		}
-		if (project.name in ['coin', 'corporate', 'notification', 'stock', 'user']) {
-			implementation 'org.springframework.boot:spring-boot-starter-validation'
-			implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
-			implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
-
-		}
+//		if (project.name != 'eureka' || project.name != 'gateway') {
+//			implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+//			runtimeOnly 'org.postgresql:postgresql'
+//			compileOnly 'org.projectlombok:lombok'
+//			annotationProcessor 'org.projectlombok:lombok'
+//		}
+//		if (project.name in ['coin', 'corporate', 'notification', 'stock', 'user']) {
+//			implementation 'org.springframework.boot:spring-boot-starter-validation'
+//			implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
+//			implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
+//
+//		}
 
 		implementation 'org.springframework.boot:spring-boot-starter-web'
 		implementation 'org.springframework.kafka:spring-kafka'

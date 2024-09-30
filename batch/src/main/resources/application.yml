@@ -1,0 +1,13 @@
+server:
+  port: 19098
+
+spring:
+  application:
+    name: batch
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:19090/eureka/
+
+
