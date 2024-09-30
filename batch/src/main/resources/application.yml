@@ -1,9 +1,25 @@
-server:
-  port: 19098
-
 spring:
-  application:
-    name: batch
+  datasource:
+    url: jdbc:postgresql://localhost:5432/tradingtrends
+    username: btc
+    password: 1234
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+
+  batch:
+    jdbc:
+      initialize-schema: always
+
+  elasticsearch:
+    uris: http://localhost:9200
 
 eureka:
   client:
@@ -11,3 +27,8 @@ eureka:
       defaultZone: http://localhost:19090/eureka/
 
 
+dart:
+  api-key: your-api-key-here
+  list-url: https://opendart.fss.or.kr/api/list.json
+  document-url: https://opendart.fss.or.kr/api/document.xml
+  batch-time: 04:00
