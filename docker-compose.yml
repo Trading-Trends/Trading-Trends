@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  postgresql_user:
+    image: 'bitnami/postgresql:latest'
+    networks:
+      - postgres_network
+    environment:
+      - POSTGRESQL_USERNAME=user
+      - POSTGRESQL_PASSWORD=user
+      - POSTGRESQL_DATABASE=user
+      - POSTGRESQL_ROOT_PASSWORD=rootpassword
+    ports:
+      - "25434:5432"
+  redis:
+    image: 'redis:latest'  # Redis 이미지 사용
+    hostname: redis
+    command: redis-server --requirepass systempass --port 6379
+    networks:
+      - postgres_network  # 동일 네트워크 사용
+    ports:
+      - "25439:6379"  # 바인딩할 포트:내부 포트
+
+networks:
+  postgres_network:
+    driver: bridge

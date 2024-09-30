@@ -1,0 +1,13 @@
+server:
+  port: 19097
+
+spring:
+  application:
+    name: notification
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:19090/eureka/
+
+
