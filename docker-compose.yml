@@ -1,17 +1,17 @@
 version: '3.8'
 
 services:
-  postgresql_user:
-    image: 'bitnami/postgresql:latest'
-    networks:
-      - postgres_network
-    environment:
-      - POSTGRESQL_USERNAME=user
-      - POSTGRESQL_PASSWORD=user
-      - POSTGRESQL_DATABASE=user
-      - POSTGRESQL_ROOT_PASSWORD=rootpassword
+  postgres:
+    image: postgres:15.8
+    restart: always
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
     ports:
-      - "25434:5432"
+      - "25432:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
   redis:
     image: 'redis:latest'  # Redis 이미지 사용
     hostname: redis
@@ -19,7 +19,7 @@ services:
     networks:
       - postgres_network  # 동일 네트워크 사용
     ports:
-      - "25439:6379"  # 바인딩할 포트:내부 포트
+      - "26379:6379"  # 바인딩할 포트:내부 포트
 
 networks:
   postgres_network:
