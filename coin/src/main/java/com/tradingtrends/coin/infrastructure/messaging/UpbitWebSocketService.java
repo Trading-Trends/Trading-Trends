@@ -1,20 +1,27 @@
 package com.tradingtrends.coin.infrastructure.messaging;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tradingtrends.coin.infrastructure.CoinTopic;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.socket.*;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 import org.springframework.web.socket.handler.BinaryWebSocketHandler;
 
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -22,12 +29,38 @@ import java.util.UUID;
 public class UpbitWebSocketService {
     private final KafkaTemplate<String, Map<String, Object>> kafkaTemplate;
     private final ObjectMapper objectMapper;
+    private final RestTemplate restTemplate;
 
     // 웹소켓 클라이언트 초기화 및 업비트 서버로 연결 시작
     @PostConstruct
     public void connectWebSocket() {
         StandardWebSocketClient client = new StandardWebSocketClient();
         client.doHandshake(new UpbitWebSocketHandler(), "wss://api.upbit.com/websocket/v1", new WebSocketHttpHeaders());
+    }
+
+    // 종목 코드 리스트 api 호출
+    private List<String> getMarketCodes() {
+        String url = "https://api.upbit.com/v1/market/all";
+        try {
+            ResponseEntity<List<Map<String, Object>>> response = restTemplate.exchange(
+                    url,
+                    HttpMethod.GET,
+                    null,
+                    new ParameterizedTypeReference<List<Map<String, Object>>>() {}
+            );
+
+            List<Map<String, Object>> marketList = response.getBody();
+
+            // KRW로 시작하는 코드만 필터링
+            return marketList.stream()
+                    .filter(market -> market.get("market").toString().startsWith("KRW"))
+                    .map(market -> market.get("market").toString())
+                    .collect(Collectors.toList());
+
+        } catch (Exception e) {
+            log.error("Failed to fetch market codes: {}", e.getMessage(), e);
+            return List.of(); // 실패 시 빈 리스트 반환
+        }
     }
 
     // 웹소켓 핸들러 클래스 정의
@@ -38,9 +71,18 @@ public class UpbitWebSocketService {
         public void afterConnectionEstablished(org.springframework.web.socket.WebSocketSession session) throws Exception {
             log.info("WebSocket connected");
 
+            // 종목 코드 리스트
+            List<String> marketCodes = getMarketCodes();
+
+            if (marketCodes.isEmpty()) {
+                log.error("종목 코드를 찾을 수 없습니다.");
+                session.close(CloseStatus.NORMAL); // 연결 종료
+                return;
+            }
+
             // 웹소켓 연결 후 업비트 서버에 요청 보내기
             String ticketValue = UUID.randomUUID().toString();
-            String message = "[{\"ticket\":\"" + ticketValue + "\"},{\"type\":\"ticker\",\"codes\":[\"KRW-BTC\"]},{\"format\":\"DEFAULT\"}]";
+            String message = "[{\"ticket\":\"" + ticketValue + "\"},{\"type\":\"ticker\",\"codes\":" + marketCodes.toString() + "},{\"format\":\"DEFAULT\"}]";
 
             session.sendMessage(new TextMessage(message));
         }
