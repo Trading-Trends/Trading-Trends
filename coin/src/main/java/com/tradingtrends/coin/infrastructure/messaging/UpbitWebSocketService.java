@@ -80,6 +80,9 @@ public class UpbitWebSocketService {
                 return;
             }
 
+            // 종목 개수
+            log.info("원화 마켓 종목 개수: {}", marketCodes.size());
+
             // 웹소켓 연결 후 업비트 서버에 요청 보내기
             String ticketValue = UUID.randomUUID().toString();
             String message = "[{\"ticket\":\"" + ticketValue + "\"},{\"type\":\"ticker\",\"codes\":" + marketCodes.toString() + "},{\"format\":\"DEFAULT\"}]";
@@ -96,13 +99,13 @@ public class UpbitWebSocketService {
             // 추출된 데이터를 Kafka 토픽으로 전송
             kafkaTemplate.send(CoinTopic.UPBIT_DATA.getTopic(), parsedData)
                     .thenAccept(result -> {
-                        log.info("Message sent successfully: {}", parsedData); // 메세지 전송 성공 로그
+//                        log.info("Message sent successfully: {}", parsedData); // 메세지 전송 성공 로그
                     })
                     .exceptionally(ex -> {
-                        log.error("Message failed to send: {}", ex.getMessage()); // 메세지 전송 실패 로그
+//                        log.error("Message failed to send: {}", ex.getMessage()); // 메세지 전송 실패 로그
                         return null;
                     });
-            log.info("Received binary message converted to text: {}", payload); // 변환된 메세지 로그
+//            log.info("Received binary message converted to text: {}", payload); // 변환된 메세지 로그
         }
 
         // 웹소켓에서 받은 메세지 데이터를 파싱 후 필요한 필드 추출하는 메서드
