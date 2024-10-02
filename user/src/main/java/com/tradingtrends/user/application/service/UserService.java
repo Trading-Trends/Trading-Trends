@@ -22,7 +22,6 @@ public class UserService {
 
         // 유저 객체 생성 및 저장
         User user = User.create(
-                userRequest.getUserId(),
                 userRequest.getUsername(),
                 encodedPassword,
                 userRequest.getEmail(),
@@ -32,13 +31,19 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    public Boolean verifyUser(String userId) {
+    public Boolean verifyUser(Long userId) {
         return userRepository.existsByUserId(userId);
     }
 
-    public UserResponse getUserById(String userId) {
+    public UserResponse getUserById(Long userId) {
         return userRepository.findByUserId(userId)
-                .map(user -> new UserResponse(user.getUserId(), user.getPassword(), user.getEmail(), user.getUsername(), user.getRole().toString()))
+                .map(user -> new UserResponse(user.getUserId(), user.getUsername(), user.getPassword(), user.getEmail(), user.getRole().toString()))
                 .orElseThrow(() -> new RuntimeException("User not found"));
     }
+    public UserResponse getUserByUsername (String username) {
+        return userRepository.findByUsername(username)
+                .map(user -> new UserResponse(user.getUserId(), user.getUsername(), user.getPassword(), user.getEmail(), user.getRole().toString()))
+                .orElseThrow(() -> new RuntimeException("User not found"));
+    }
+
 }

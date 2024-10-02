@@ -9,5 +9,5 @@ import org.springframework.web.bind.annotation.RequestParam;
 @FeignClient(name = "auth")
 public interface AuthClient extends AuthService {
     @GetMapping("/auth/verify") // 유저 검증 API
-    Boolean verifyUser(@RequestParam(value = "user_id") String userId);
+    Boolean verifyUser(@RequestParam(value = "user_id") Long userId);
 }

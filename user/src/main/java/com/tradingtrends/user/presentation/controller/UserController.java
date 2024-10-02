@@ -18,20 +18,28 @@ public class UserController {
         this.userService = userService;
     }
 
-    @GetMapping("/{user_id}")
-    public ResponseEntity<UserResponse> getUserById(@PathVariable("user_id") String userId) {
-        return ResponseEntity.ok(userService.getUserById(userId));
-    }
-
     // 회원가입 API
+
     @PostMapping
     public ResponseEntity<UserResponse> registerUser(@RequestBody UserRequest userRequest) {
         User user = userService.registerUser(userRequest);
-        return ResponseEntity.ok(new UserResponse(user.getUserId(), user.getPassword(),user.getEmail(), user.getUsername(), user.getRole().toString()));
+        return ResponseEntity.ok(new UserResponse(user.getUserId(), user.getUsername(), user.getPassword(),user.getEmail(), user.getRole().toString()));
     }
 
     @GetMapping("/verify")
-    public ResponseEntity<Boolean> verifyUser(@RequestParam("user_id") String userId) {
+    public ResponseEntity<Boolean> verifyUser(@RequestParam("user_id") Long userId) {
         return ResponseEntity.ok(userService.verifyUser(userId));
     }
+
+
+    @GetMapping("/id/{user_id}")
+    public ResponseEntity<UserResponse> getUserById(@PathVariable("user_id") Long userId) {
+        return ResponseEntity.ok(userService.getUserById(userId));
+    }
+
+    @GetMapping("/{username}")
+    public ResponseEntity<UserResponse> getUserByUsername(@PathVariable("username") String username) {
+        return ResponseEntity.ok(userService.getUserByUsername(username));
+    }
+
 }

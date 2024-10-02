@@ -36,7 +36,7 @@ public class LocalJwtAuthenticationFilter implements GlobalFilter {
         // 접근하는 URI 의 Path 값을 받아옵니다.
         String path = exchange.getRequest().getURI().getPath();
         // /auth 로 시작하는 요청들은 검증하지 않습니다.
-        if (path.startsWith("/auth") || path.startsWith("/member")) {
+        if (path.startsWith("/auth") || path.equals("/member")) {
             return chain.filter(exchange);
         }
 
@@ -76,7 +76,7 @@ public class LocalJwtAuthenticationFilter implements GlobalFilter {
                 // user_id 추출 로직
                 String userId = claimsJws.getPayload().get("user_id").toString();
                 // user_id 값으로 해당 유저가 회원가입 한 유저인지 인증 서비스를 통해 확인합니다.
-                return authService.verifyUser(userId);
+                return authService.verifyUser(Long.parseLong(userId));
             } else {
                 return false;
             }
