@@ -17,9 +17,10 @@ spring:
   batch:
     jdbc:
       initialize-schema: always
-
   elasticsearch:
-    uris: http://localhost:9200
+    uris: 0.0.0.0:9200
+
+
 
 eureka:
   client:
@@ -28,7 +29,7 @@ eureka:
 
 
 dart:
-  api-key: your-api-key-here
+  api-key: ${DART-API-KEY}
   list-url: https://opendart.fss.or.kr/api/list.json
   document-url: https://opendart.fss.or.kr/api/document.xml
-  batch-time: 04:00
+
