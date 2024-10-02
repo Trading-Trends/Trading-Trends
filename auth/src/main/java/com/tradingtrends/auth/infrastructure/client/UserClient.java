@@ -9,8 +9,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 public interface UserClient {
 
     @GetMapping("/member/verify")
-    Boolean verifyUser(@RequestParam(value = "user_id") String userId);
+    Boolean verifyUser(@RequestParam(value = "user_id") Long userId);
 
-    @GetMapping("/member/{user_id}")
-    UserResponse getUserById(@PathVariable("user_id") String userId);
+    @GetMapping("/member/id/{user_id}")
+    UserResponse getUserById(@PathVariable("user_id") Long userId);
+
+    @GetMapping("/member/{username}")
+    UserResponse getUserByUsername(@PathVariable("username") String username);
 }
