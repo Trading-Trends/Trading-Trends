@@ -1,25 +1,9 @@
 server:
-  port: 19096
+  port: 19100
 
 spring:
   application:
-    name: coin
-
-  datasource:
-    driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:25432/postgres
-    username: coi
-    password: 1234
-
-  jpa:
-    hibernate:
-      ddl-auto: update
-    properties:
-      hibernate:
-        show_sql: true
-        format_sql: true
-        dialect: org.hibernate.dialect.PostgreSQLDialect
-        default_batch_fetch_size: 1000
+    name: market
 
   kafka:
     bootstrap-servers: localhost:9092
