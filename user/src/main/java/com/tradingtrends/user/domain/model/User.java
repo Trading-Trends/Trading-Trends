@@ -13,13 +13,10 @@ public class User {
 
     @Id // 변경된 부분
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
-    private Long id;
+    @Column(name = "user_id")
+    private Long userId;
 
-    @Column(name = "user_id", nullable = false, unique = true)
-    private String userId;
-
-    @Column(name = "username", nullable = false)
+    @Column(name = "username", nullable = false, unique = true)
     private String username;
 
     @Column(name = "password", nullable = false)
@@ -34,14 +31,12 @@ public class User {
 
     // 유저 생성 메서드
     public static User create(
-            final String userId,
             final String username,
             final String password,
             final String email,
             final Role role
     ) {
         return User.builder()
-                .userId(userId)
                 .username(username)
                 .password(password)
                 .email(email)
