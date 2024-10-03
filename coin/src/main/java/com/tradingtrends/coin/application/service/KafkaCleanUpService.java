@@ -9,11 +9,15 @@ import java.util.concurrent.ExecutionException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.admin.AdminClient;
 import org.apache.kafka.clients.admin.AdminClientConfig;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 @Service
 @Slf4j
 public class KafkaCleanUpService {
+
+    @Value("${spring.kafka.bootstrap-servers}")
+    private String bootstrapAddress;
 
     private final AdminClient adminClient;
 
