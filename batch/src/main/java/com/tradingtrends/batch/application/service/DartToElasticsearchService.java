@@ -48,7 +48,7 @@ public class DartToElasticsearchService {
     private ElasticsearchClient elasticsearchClient;
 
     public void fetchDocumentAndSaveToElasticsearch(String rceptNo) throws IOException {
-        String url = documentUrl + "?crtfc_key=" + apiKey + "&rcept_no=" + rceptNo;
+        String url = documentUrl + "?crtfc_key=" + apiKey + "&rcept_no=" + rceptNo +"&reprt_code=" ;
         log.info("[문서 패치] Fetching dart document from " + url);
 
         // 원본 zip 파일 요청 및 다운로드
@@ -93,7 +93,7 @@ public class DartToElasticsearchService {
             String xmlContent = new String(Files.readAllBytes(xmlFilePath));
 
             // XML의 태그 안에 있는 텍스트는 보존하고, 외부의 특수문자만 이스케이프 처리
-            String escapedContent = escapeSpecialCharactersOutsideTags(xmlContent);
+            String escapedContent = escapeSpecialCharacters(xmlContent);
 
             log.info("Processed XML content: " + escapedContent.substring(0, 1500)); // 예시로 1500글자 출력
 
@@ -203,67 +203,42 @@ public class DartToElasticsearchService {
         }
     }
 
-    private String escapeSpecialCharactersOutsideTags(String xmlContent) {
+    public String escapeSpecialCharacters(String htmlContent) {
         StringBuilder result = new StringBuilder();
-        boolean insideRealTag = false;  // 실제 태그인지 확인
-        boolean insidePossibleContent = false;  // 실제 태그 내부가 아닌 곳에 있는 내용인지 확인
+        boolean insideTag = false;
 
-        for (int i = 0; i < xmlContent.length(); i++) {
-            char c = xmlContent.charAt(i);
-
+        for (char c : htmlContent.toCharArray()) {
             if (c == '<') {
-                // 태그의 시작을 만나면 insideRealTag 상태로 전환
-                if (insideRealTag) {
-                    // 이미 태그 안이라면, 태그처럼 보이는 텍스트이므로 특수 문자를 변환
-                    result.append("&lt;");
-                } else {
-                    insideRealTag = true;
-                    result.append(c);  // 실제 태그 시작을 그대로 추가
-                }
-                continue;
-            }
+                insideTag = true;  // 태그의 시작
+                result.append(c);  // '<' 추가
+            } else if (c == '>') {
+                insideTag = false; // 태그의 끝
+                result.append(c);  // '>' 추가
+            } else if (insideTag) {
+                // 태그 내부
+                result.append(c); // 일반 문자 추가
 
-            if (c == '>') {
-                // 태그의 끝을 만나면 insideRealTag 상태에서 벗어남
-                if (insideRealTag) {
-                    insideRealTag = false;
-                    result.append(c);  // 실제 태그 끝을 그대로 추가
-                } else {
-                    // 태그가 아닌 경우 '>' 특수 문자 변환
-                    result.append("&gt;");
-                }
-                continue;
-            }
-
-            if (insideRealTag) {
-                // 실제 태그 안쪽인 경우 그대로 추가
-                result.append(c);
             } else {
-                // 태그 외부 또는 태그처럼 보이는 내용의 특수문자 처리
-                switch (c) {
-                    case '&':
-                        result.append("&amp;");
-                        break;
-                    case '"':
-                        result.append("&quot;");
-                        break;
-                    case '\'':
-                        result.append("&apos;");
-                        break;
-                    case '<':
-                        result.append("&lt;");
-                        break;
-                    case '>':
-                        result.append("&gt;");
-                        break;
-                    default:
-                        result.append(c);
+                // 태그 외부에서의 특수문자 변환
+                if (c == '&') {
+                    result.append("&amp;");
+                } else if (c == '<') {
+                    result.append("&lt;");
+                } else if (c == '>') {
+                    result.append("&gt;");
+                } else if (c == '"') {
+                    result.append("&quot;");
+                } else if (c == '\'') {
+                    result.append("&apos;");
+                } else {
+                    result.append(c); // 일반 문자 추가
                 }
             }
         }
 
         return result.toString();
     }
+
 
 
 

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tradingtrends.batch.domain.model.Entity.Disclosure;
 import com.tradingtrends.batch.domain.repository.DisclosureRepository;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +22,7 @@ import java.util.logging.Logger;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class DartDisclosureService {
 
     @Value("${dart.api-key}")
@@ -32,11 +34,6 @@ public class DartDisclosureService {
     private final DisclosureRepository disclosureRepository;
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final RestTemplate restTemplate = new RestTemplate();
-
-
-    public DartDisclosureService(DisclosureRepository disclosureRepository) {
-        this.disclosureRepository = disclosureRepository;
-    }
 
     public List<Disclosure> fetchDisclosuresToday() {
         String today = LocalDate.now().format(DateTimeFormatter.BASIC_ISO_DATE);

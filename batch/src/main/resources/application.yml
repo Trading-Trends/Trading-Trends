@@ -33,3 +33,7 @@ dart:
   list-url: https://opendart.fss.or.kr/api/list.json
   document-url: https://opendart.fss.or.kr/api/document.xml
 
+logging:
+  level:
+    org:
+      springframework: DEBUG
