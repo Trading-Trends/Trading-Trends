@@ -9,10 +9,12 @@ import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.repository.support.JobRepositoryFactoryBean;
 import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.transaction.PlatformTransactionManager;
 
 import java.util.List;
@@ -38,6 +40,7 @@ public class BatchConfig {
         this.disclosureRepository = disclosureRepository;
         this.dartToElasticsearchService = dartToElasticsearchService;
     }
+
 
     @Bean
     public Job disclosureJob(Step step1, Step step2) {
