@@ -3,39 +3,28 @@ package com.tradingtrends.batch.application.service;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch.core.IndexRequest;
 import co.elastic.clients.elasticsearch.core.IndexResponse;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.tradingtrends.batch.domain.model.Entity.DisclosureDocument;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipFile;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-import org.xml.sax.InputSource;
-import org.apache.commons.text.StringEscapeUtils;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathFactory;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.StringReader;
+import java.io.*;
 import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import org.xml.sax.SAXException;
+import java.util.Enumeration;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class DartToElasticsearchService {
 
     @Value("${dart.api-key}")
@@ -44,237 +33,152 @@ public class DartToElasticsearchService {
     @Value("${dart.document-url}")
     private String documentUrl;
 
-    @Autowired
-    private ElasticsearchClient elasticsearchClient;
+    private final ElasticsearchClient elasticsearchClient;
+    private final RestTemplate restTemplate = new RestTemplate();
 
-    public void fetchDocumentAndSaveToElasticsearch(String rceptNo) throws IOException {
-        String url = documentUrl + "?crtfc_key=" + apiKey + "&rcept_no=" + rceptNo;
-        log.info("[문서 패치] Fetching dart document from " + url);
+    public void fetchDocumentAndSaveToElasticsearch(String rceptNo) {
+        String url = String.format("%s?crtfc_key=%s&rcept_no=%s", documentUrl, apiKey, rceptNo);
+        log.info("[문서 패치] Fetching DART document from {}", url);
 
-        // 원본 zip 파일 요청 및 다운로드
-        RestTemplate restTemplate = new RestTemplate();
+        try {
+            byte[] zipData = downloadZipFile(url);
+            File xmlFile = extractXmlFromZip(zipData);
+            DisclosureDocument document = parseXmlToDisclosureDocument(xmlFile);
+            indexDocumentToElasticsearch(rceptNo, document);
+            log.info("Data ingestion completed successfully for rceptNo: {}", rceptNo);
+        } catch (Exception e) {
+            log.error("Error processing rceptNo {}: {}", rceptNo, e.getMessage(), e);
+        }
+    }
+
+    private byte[] downloadZipFile(String url) throws IOException {
         ResponseEntity<byte[]> response = restTemplate.exchange(url, HttpMethod.GET, null, byte[].class);
-        log.info("Fetched document response size: " + response.getBody().length);
+        if (response.getBody() == null || response.getBody().length == 0) {
+            throw new IOException("Received empty response from DART API");
+        }
+        log.info("Downloaded ZIP file size: {} bytes", response.getBody().length);
+        return response.getBody();
+    }
 
-        // 압축 해제
-        File tempFile = Files.createTempFile("dart", ".zip").toFile();
-        Files.write(tempFile.toPath(), Objects.requireNonNull(response.getBody()));
-        ZipFile zipFile = new ZipFile(tempFile);
-        ZipArchiveEntry entry = zipFile.getEntries().asIterator().next(); // 첫 번째 파일
+    private File extractXmlFromZip(byte[] zipData) throws IOException {
+        File tempZipFile = Files.createTempFile("dart_", ".zip").toFile();
+        Files.write(tempZipFile.toPath(), zipData);
 
-        Path extractedPath = Files.createTempFile("extracted", ".xml");
-        try (InputStream zipInputStream = zipFile.getInputStream(entry)) {
-            Files.copy(zipInputStream, extractedPath, StandardCopyOption.REPLACE_EXISTING);
+        try (ZipFile zipFile = new ZipFile(tempZipFile)) {
+            Enumeration<ZipArchiveEntry> entries = zipFile.getEntries();
+            while (entries.hasMoreElements()) {
+                ZipArchiveEntry entry = entries.nextElement();
+                if (entry.getName().endsWith(".xml")) {
+                    File tempXmlFile = Files.createTempFile("dart_xml_", ".xml").toFile();
+                    try (InputStream is = zipFile.getInputStream(entry);
+                         OutputStream os = new FileOutputStream(tempXmlFile)) {
+                        byte[] buffer = new byte[1024];
+                        int length;
+                        while ((length = is.read(buffer)) > 0) {
+                            os.write(buffer, 0, length);
+                        }
+                    }
+                    log.info("Extracted XML file: {}", tempXmlFile.getAbsolutePath());
+                    return tempXmlFile;
+                }
+            }
+            throw new FileNotFoundException("No XML file found in the ZIP archive");
+        } finally {
+            if (!tempZipFile.delete()) {
+                log.warn("Failed to delete temporary ZIP file: {}", tempZipFile.getAbsolutePath());
+            }
+        }
+    }
+
+    private DisclosureDocument parseXmlToDisclosureDocument(File xmlFile) throws IOException {
+        XmlMapper xmlMapper = new XmlMapper();
+        xmlMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+
+        // 파일을 문자열로 읽기
+        String xmlContent;
+        try (InputStream inputStream = new FileInputStream(xmlFile)) {
+            xmlContent = new String(inputStream.readAllBytes());
         }
 
-        // XML 파일을 DisclosureDocument로 변환
-        DisclosureDocument disclosureDocument = parseXmlToDisclosureDocument(extractedPath);
+        log.info("원본 XML 내용: \n{}", xmlContent.substring(0, Math.min(xmlContent.length(), 500)));
 
-        // Elasticsearch에 저장
-        IndexRequest<DisclosureDocument> indexRequest = new IndexRequest.Builder<DisclosureDocument>()
+        // 태그 내부 텍스트만 이스케이프 처리
+        xmlContent = XmlEscapeUtil.escapeXmlInsideTags(xmlContent);
+
+        log.info("이스케이프된 XML 내용: \n{}", xmlContent.substring(0, Math.min(xmlContent.length(), 500)));
+
+        // 처리된 XML 문자열을 파싱
+            DisclosureDocument document = xmlMapper.readValue(xmlContent, DisclosureDocument.class);
+            log.info("Parsed DisclosureDocument: {}", document.getDocumentName());
+            return document;
+    }
+
+    private void indexDocumentToElasticsearch(String rceptNo, DisclosureDocument document) throws IOException {
+        IndexRequest<DisclosureDocument> indexRequest = IndexRequest.of(i -> i
                 .index("disclosures")
                 .id(rceptNo)
-                .document(disclosureDocument)
-                .build();
-
-        IndexResponse responseES = elasticsearchClient.index(indexRequest);
-        log.info("Document indexed with ID: " + responseES.id());
+                .document(document)
+        );
+        IndexResponse response = elasticsearchClient.index(indexRequest);
+        log.info("Indexed document with ID: {}", response.id());
     }
 
-    private DisclosureDocument parseXmlToDisclosureDocument(Path xmlFilePath) {
-        try {
+    public static class XmlEscapeUtil {
 
+        // 진짜 태그 형식에 맞지 않는 가짜 태그 패턴
+        private static final Pattern PSEUDO_TAG_PATTERN = Pattern.compile("<([가-힣][^<>]*?)>");
+        // 태그 안의 텍스트만 처리하는 패턴
+        private static final Pattern TAG_CONTENT_PATTERN = Pattern.compile(">([^<]+)<");
 
-            // XML 파서 설정
-            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder builder = factory.newDocumentBuilder();
-
-            // XML 파일을 문자열로 읽기
-            String xmlContent = new String(Files.readAllBytes(xmlFilePath));
-
-            // XML의 태그 안에 있는 텍스트는 보존하고, 외부의 특수문자만 이스케이프 처리
-            String escapedContent = escapeSpecialCharactersOutsideTags(xmlContent);
-
-            log.info("Processed XML content: " + escapedContent.substring(0, 1500)); // 예시로 1500글자 출력
-
-            // 이스케이프 처리한 XML 내용을 Document로 파싱
-            org.w3c.dom.Document xmlDocument = builder.parse(new InputSource(new StringReader(escapedContent)));
-
-
-            // XPath 설정
-            XPathFactory xPathFactory = XPathFactory.newInstance();
-            XPath xPath = xPathFactory.newXPath();
-
-            // DisclosureDocument 생성 및 필드 매핑
-            DisclosureDocument.DisclosureDocumentBuilder documentBuilder = DisclosureDocument.builder()
-                    .documentId(getXPathValue(xPath, xmlDocument, "/Document/DocumentId"))
-                    .documentName(getXPathValue(xPath, xmlDocument, "/Document/DocumentName"))
-                    .formulaVersion(getXPathValue(xPath, xmlDocument, "/Document/FormulaVersion"))
-                    .companyName(getXPathValue(xPath, xmlDocument, "/Document/CompanyName"))
-                    .registrationNumber(getXPathValue(xPath, xmlDocument, "/Document/RegistrationNumber"))
-                    .summary(getXPathValue(xPath, xmlDocument, "/Document/Summary"))
-                    .reportDate(getXPathValue(xPath, xmlDocument, "/Document/ReportDate"));
-
-            // 정정 사항
-            List<DisclosureDocument.Correction> corrections = new ArrayList<>();
-            org.w3c.dom.NodeList correctionNodes = (org.w3c.dom.NodeList) xPath.evaluate("/Document/Corrections/Correction", xmlDocument, XPathConstants.NODESET);
-            for (int i = 0; i < correctionNodes.getLength(); i++) {
-                org.w3c.dom.Node node = correctionNodes.item(i);
-                corrections.add(DisclosureDocument.Correction.builder()
-                        .correctionDetails(getXPathValue(xPath, node, "CorrectionDetails"))
-                        .correctionDate(getXPathValue(xPath, node, "CorrectionDate"))
-                        .build());
-            }
-            documentBuilder.corrections(corrections);
-
-            // 라이브러리
-            List<DisclosureDocument.Library> libraries = new ArrayList<>();
-            org.w3c.dom.NodeList libraryNodes = (org.w3c.dom.NodeList) xPath.evaluate("/Document/Libraries/Library", xmlDocument, XPathConstants.NODESET);
-            for (int i = 0; i < libraryNodes.getLength(); i++) {
-                org.w3c.dom.Node node = libraryNodes.item(i);
-                List<DisclosureDocument.Table> tables = new ArrayList<>();
-                org.w3c.dom.NodeList tableNodes = (org.w3c.dom.NodeList) xPath.evaluate("Tables/Table", node, XPathConstants.NODESET);
-                for (int j = 0; j < tableNodes.getLength(); j++) {
-                    org.w3c.dom.Node tableNode = tableNodes.item(j);
-                    List<DisclosureDocument.Row> rows = new ArrayList<>();
-                    org.w3c.dom.NodeList rowNodes = (org.w3c.dom.NodeList) xPath.evaluate("Rows/Row", tableNode, XPathConstants.NODESET);
-                    for (int k = 0; k < rowNodes.getLength(); k++) {
-                        org.w3c.dom.Node rowNode = rowNodes.item(k);
-                        List<DisclosureDocument.Cell> cells = new ArrayList<>();
-                        org.w3c.dom.NodeList cellNodes = (org.w3c.dom.NodeList) xPath.evaluate("Cells/Cell", rowNode, XPathConstants.NODESET);
-                        for (int l = 0; l < cellNodes.getLength(); l++) {
-                            org.w3c.dom.Node cellNode = cellNodes.item(l);
-                            cells.add(DisclosureDocument.Cell.builder()
-                                    .width(Integer.parseInt(getXPathValue(xPath, cellNode, "Width")))
-                                    .height(Integer.parseInt(getXPathValue(xPath, cellNode, "Height")))
-                                    .alignment(getXPathValue(xPath, cellNode, "Alignment"))
-                                    .content(getXPathValue(xPath, cellNode, "Content"))
-                                    .build());
-                        }
-                        rows.add(DisclosureDocument.Row.builder()
-                                .isCopyable(Boolean.parseBoolean(getXPathValue(xPath, rowNode, "IsCopyable")))
-                                .isDeletable(Boolean.parseBoolean(getXPathValue(xPath, rowNode, "IsDeletable")))
-                                .cells(cells)
-                                .build());
-                    }
-                    tables.add(DisclosureDocument.Table.builder()
-                            .tableClass(getXPathValue(xPath, tableNode, "TableClass"))
-                            .isFixedTable(Boolean.parseBoolean(getXPathValue(xPath, tableNode, "IsFixedTable")))
-                            .width(Integer.parseInt(getXPathValue(xPath, tableNode, "Width")))
-                            .rows(rows)
-                            .build());
-                }
-                libraries.add(DisclosureDocument.Library.builder()
-                        .title(getXPathValue(xPath, node, "Title"))
-                        .content(getXPathValue(xPath, node, "Content"))
-                        .tables(tables)
-                        .build());
-            }
-            documentBuilder.libraries(libraries);
-
-            // DisclosureDocument 반환
-            return documentBuilder.build();
-
-        } catch (Exception e) {
-            log.error("Error parsing XML to DisclosureDocument", e);
-            return null;
-        }
-    }
-
-    private boolean isValidXml(Path xmlFilePath) {
-        try {
-            // XML 파서 설정
-            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder builder = factory.newDocumentBuilder();
-            builder.parse(xmlFilePath.toFile());
-            return true;
-        } catch (SAXException | IOException | ParserConfigurationException e) {
-            log.error("Invalid XML format for file: " + xmlFilePath, e);
-            return false;
-        }
-    }
-
-    private String getXPathValue(XPath xPath, org.w3c.dom.Node node, String expression) {
-        try {
-            return xPath.evaluate(expression, node);
-        } catch (Exception e) {
-            log.error("Error evaluating XPath expression: " + expression, e);
-            return null;
-        }
-    }
-
-    private String escapeSpecialCharactersOutsideTags(String xmlContent) {
-        StringBuilder result = new StringBuilder();
-        boolean insideRealTag = false;  // 실제 태그인지 확인
-        boolean insidePossibleContent = false;  // 실제 태그 내부가 아닌 곳에 있는 내용인지 확인
-
-        for (int i = 0; i < xmlContent.length(); i++) {
-            char c = xmlContent.charAt(i);
-
-            if (c == '<') {
-                // 태그의 시작을 만나면 insideRealTag 상태로 전환
-                if (insideRealTag) {
-                    // 이미 태그 안이라면, 태그처럼 보이는 텍스트이므로 특수 문자를 변환
-                    result.append("&lt;");
-                } else {
-                    insideRealTag = true;
-                    result.append(c);  // 실제 태그 시작을 그대로 추가
-                }
-                continue;
+        public static String escapeXmlInsideTags(String input) {
+            if (input == null) {
+                return null;
             }
 
-            if (c == '>') {
-                // 태그의 끝을 만나면 insideRealTag 상태에서 벗어남
-                if (insideRealTag) {
-                    insideRealTag = false;
-                    result.append(c);  // 실제 태그 끝을 그대로 추가
-                } else {
-                    // 태그가 아닌 경우 '>' 특수 문자 변환
-                    result.append("&gt;");
-                }
-                continue;
+            // 먼저 가짜 태그를 감지하고 이를 이스케이프 처리
+            input = escapePseudoTags(input);
+
+            Matcher matcher = TAG_CONTENT_PATTERN.matcher(input);
+            StringBuilder escapedXml = new StringBuilder();
+
+            // 태그 내부 텍스트만 이스케이프 처리
+            while (matcher.find()) {
+                String contentInsideTag = matcher.group(1);
+                String escapedContent = escapeXml(contentInsideTag);
+
+                matcher.appendReplacement(escapedXml, ">" + Matcher.quoteReplacement(escapedContent) + "<");
             }
 
-            if (insideRealTag) {
-                // 실제 태그 안쪽인 경우 그대로 추가
-                result.append(c);
-            } else {
-                // 태그 외부 또는 태그처럼 보이는 내용의 특수문자 처리
-                switch (c) {
-                    case '&':
-                        result.append("&amp;");
-                        break;
-                    case '"':
-                        result.append("&quot;");
-                        break;
-                    case '\'':
-                        result.append("&apos;");
-                        break;
-                    case '<':
-                        result.append("&lt;");
-                        break;
-                    case '>':
-                        result.append("&gt;");
-                        break;
-                    default:
-                        result.append(c);
-                }
-            }
+            matcher.appendTail(escapedXml);
+            return escapedXml.toString();
         }
 
-        return result.toString();
+        // 가짜 태그를 이스케이프 처리
+        public static String escapePseudoTags(String input) {
+            Matcher matcher = PSEUDO_TAG_PATTERN.matcher(input);
+            StringBuffer result = new StringBuffer();
+
+            while (matcher.find()) {
+                String pseudoTag = matcher.group(0);  // 가짜 태그 전체를 찾음
+                String escapedTag = pseudoTag.replace("<", "&lt;").replace(">", "&gt;");
+                matcher.appendReplacement(result, Matcher.quoteReplacement(escapedTag));
+            }
+
+            matcher.appendTail(result);
+            return result.toString();
+        }
+
+        // XML 특수 문자를 이스케이프 처리
+        public static String escapeXml(String input) {
+            if (input == null) {
+                return null;
+            }
+            return input
+                    .replace("&", "&amp;")
+                    .replace("<", "&lt;")
+                    .replace(">", "&gt;")
+                    .replace("\"", "&quot;")
+                    .replace("'", "&apos;");
+        }
     }
-
-
-
-    private String escapeXmlSpecialCharacters(String xml) {
-        if (xml == null) return null;
-        return xml.replace("&", "&amp;")
-                .replace("<", "&lt;")
-                .replace(">", "&gt;")
-                .replace("\"", "&quot;")
-                .replace("'", "&apos;");
-    }
-
-
 }

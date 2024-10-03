@@ -63,8 +63,9 @@ public class BatchConfig {
         return new StepBuilder("fetchAndStoreDocuments", jobRepository)
                 .tasklet((contribution, chunkContext) -> {
                     List<String> rceptNos = disclosureRepository.findRceptNosForToday();
+                    List<String> reprt_codes = List.of("11013", "11012", "11014", "11011");
                     for (String rceptNo : rceptNos) {
-                        dartToElasticsearchService.fetchDocumentAndSaveToElasticsearch(rceptNo);
+                            dartToElasticsearchService.fetchDocumentAndSaveToElasticsearch(rceptNo);
                     }
                     return RepeatStatus.FINISHED;
                 }, transactionManager)

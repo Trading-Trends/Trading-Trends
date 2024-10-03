@@ -3,7 +3,6 @@ package com.tradingtrends.batch.presentation.controller;
 import com.tradingtrends.batch.application.service.DartDisclosureService;
 import com.tradingtrends.batch.application.service.DartToElasticsearchService;
 import com.tradingtrends.batch.domain.model.Entity.Disclosure;
-import com.tradingtrends.batch.domain.repository.DisclosureRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -36,10 +35,10 @@ public class DartManualController {
 
         // 3. 오늘 날짜의 공시 데이터를 가져옴
         List<String> rceptNos = dartDisclosureService.findRceptNoByLoadDtBetween(startOfToday, endOfToday);
-
+        List<String> reprt_codes = List.of("11013", "11012", "11014", "11011");
         // 4. 공시 번호로 엘라스틱서치에 저장
         for (String rceptNo : rceptNos) {
-            dartToElasticsearchService.fetchDocumentAndSaveToElasticsearch(rceptNo);
+                dartToElasticsearchService.fetchDocumentAndSaveToElasticsearch(rceptNo);
         }
     }
 }
