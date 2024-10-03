@@ -101,20 +101,22 @@ public class UpbitWebSocketService {
             try {
                 // JSON 직렬화
                 String jsonMessage = objectMapper.writeValueAsString(parsedData);
+                String marketCode = String.valueOf(parsedData.get("market"));
 
                 // Kafka 토픽에 JSON 메시지 전송
-                CompletableFuture<SendResult<String, String>> future = kafkaTemplate.send(CoinTopic.UPBIT_DATA.getTopic(), jsonMessage);
+                CompletableFuture<SendResult<String, String>> future = kafkaTemplate.send(CoinTopic.UPBIT_DATA.getTopic(),marketCode, jsonMessage);
 
                 // 메시지 전송 결과 처리 (비동기적으로 성공/실패 로직)
                 future.whenComplete((result, ex) -> {
                     if (ex == null) {
                         // 메시지 전송 성공
-                        log.info("Message sent successfully to partition=[{}], offset=[{}]",
+                        log.info("Message sent successfully to partition=[{}], offset=[{}] for stockCode={}",
                             result.getRecordMetadata().partition(),
-                            result.getRecordMetadata().offset());
+                            result.getRecordMetadata().offset(),
+                            marketCode);
                     } else {
                         // 메시지 전송 실패
-                        log.error("Message failed to send due to: {}", ex.getMessage());
+                        log.error("Message failed to send for stockCode={} due to: {}", marketCode, ex.getMessage());
                         // 필요 시 재시도 로직 추가 가능
                     }
                 });
