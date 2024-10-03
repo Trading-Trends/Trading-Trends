@@ -34,9 +34,9 @@ spring:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer # Kafka 메시지의 키를 문자열로 직렬화
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer # Kafka 메세지의 값을 JSON으로 직렬화
 
-eureka:
-  client:
-    service-url:
-      defaultZone: http://localhost:19090/eureka/
+#eureka:
+#  client:
+#    service-url:
+#      defaultZone: http://localhost:19090/eureka/
 
 
