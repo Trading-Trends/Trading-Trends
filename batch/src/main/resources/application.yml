@@ -16,7 +16,7 @@ spring:
 
   batch:
     jdbc:
-      initialize-schema: never
+      initialize-schema: always
   elasticsearch:
     uris: 0.0.0.0:9200
 

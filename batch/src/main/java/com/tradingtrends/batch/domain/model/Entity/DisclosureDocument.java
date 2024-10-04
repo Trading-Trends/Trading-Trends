@@ -25,63 +25,91 @@ public class DisclosureDocument {
     @JacksonXmlProperty(localName = "DOCUMENT-ID")
     private String documentId;
 
-    @Field(type = FieldType.Text)
     @JacksonXmlProperty(localName = "DOCUMENT-NAME")
-    private String documentName;
+    private DocumentNameElement documentName;
 
-    @Field(type = FieldType.Text)
     @JacksonXmlProperty(localName = "FORMULA-VERSION")
-    private String formulaVersion;
+    private FormulaVersion formulaVersion;
 
-    @Field(type = FieldType.Text)
     @JacksonXmlProperty(localName = "COMPANY-NAME")
-    private String companyName;
+    private CompanyName companyName;
 
-    @Field(type = FieldType.Nested)
-    @JacksonXmlElementWrapper(localName = "BODY")
+    @JacksonXmlElementWrapper(localName = "SUMMARY", useWrapping = false)
+    @JacksonXmlProperty(localName = "EXTRACTION")
+    private List<Extraction> extractions;
+
+    @JacksonXmlElementWrapper(localName = "BODY", useWrapping = false)
     @JacksonXmlProperty(localName = "LIBRARY")
-    private List<Library> libraries;
+    private List<LibraryElement> libraries;
 
-    // 내부 클래스들...
+    // 내부 클래스 정의
     @Getter
     @Setter
     @NoArgsConstructor
-    @ToString
-    public static class Library {
+    public static class DocumentNameElement {
+        @JacksonXmlProperty(isAttribute = true, localName = "ACODE")
+        private String acode;
 
-        @JacksonXmlElementWrapper(useWrapping = false)
-        @JacksonXmlProperty(localName = "SECTION-1")
-        private List<Section> sections;
+        @JacksonXmlText
+        private String name;
     }
 
     @Getter
     @Setter
     @NoArgsConstructor
-    @ToString
-    public static class Section {
+    public static class FormulaVersion {
+        @JacksonXmlProperty(isAttribute = true, localName = "ADATE")
+        private String adate;
 
+        @JacksonXmlText
+        private String version;
+    }
+
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    public static class CompanyName {
+        @JacksonXmlProperty(isAttribute = true, localName = "AREGCIK")
+        private String regcik;
+
+        @JacksonXmlText
+        private String name;
+    }
+
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    public static class Extraction {
+        @JacksonXmlProperty(isAttribute = true, localName = "ACODE")
+        private String acode;
+
+        @JacksonXmlProperty(isAttribute = true, localName = "AFEATURE")
+        private String feature;
+
+        @JacksonXmlText
+        private String value;
+    }
+
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    public static class LibraryElement {
+        @JacksonXmlElementWrapper(useWrapping = false)
         @JacksonXmlProperty(localName = "TITLE")
-        private Title title;
+        private List<TitleElement> titles;
 
-        @JacksonXmlElementWrapper(useWrapping = false)
-        @JacksonXmlProperty(localName = "TABLE-GROUP")
-        private List<TableGroup> tableGroups;
-
-        @JacksonXmlElementWrapper(useWrapping = false)
-        @JacksonXmlProperty(localName = "P")
-        private List<String> paragraphs;
+        @JacksonXmlElementWrapper(localName = "TABLE", useWrapping = false)
+        private List<Table> tables;
     }
 
     @Getter
     @Setter
     @NoArgsConstructor
-    @ToString
-    public static class Title {
-
-        @JacksonXmlProperty(localName = "ATOC")
+    public static class TitleElement {
+        @JacksonXmlProperty(isAttribute = true, localName = "ATOC")
         private String atoc;
 
-        @JacksonXmlProperty(localName = "AASSOCNOTE")
+        @JacksonXmlProperty(isAttribute = true, localName = "AASSOCNOTE")
         private String aassocnote;
 
         @JacksonXmlText
@@ -91,77 +119,25 @@ public class DisclosureDocument {
     @Getter
     @Setter
     @NoArgsConstructor
-    @ToString
-    public static class TableGroup {
-
-        @JacksonXmlElementWrapper(useWrapping = false)
-        @JacksonXmlProperty(localName = "TABLE")
-        private List<Table> tables;
-    }
-
-    @Getter
-    @Setter
-    @NoArgsConstructor
-    @ToString
     public static class Table {
-
-        @JacksonXmlElementWrapper(useWrapping = false)
-        @JacksonXmlProperty(localName = "COLGROUP")
-        private List<ColGroup> colGroups;
-
-        @JacksonXmlElementWrapper(useWrapping = false)
-        @JacksonXmlProperty(localName = "TBODY")
-        private List<TableBody> tableBodies;
-    }
-
-    @Getter
-    @Setter
-    @NoArgsConstructor
-    @ToString
-    public static class ColGroup {
-
-        @JacksonXmlProperty(localName = "COL")
-        private List<Col> cols;
-    }
-
-    @Getter
-    @Setter
-    @NoArgsConstructor
-    @ToString
-    public static class Col {
-
-        @JacksonXmlProperty(localName = "WIDTH")
-        private String width;
-    }
-
-    @Getter
-    @Setter
-    @NoArgsConstructor
-    @ToString
-    public static class TableBody {
-
-        @JacksonXmlElementWrapper(useWrapping = false)
-        @JacksonXmlProperty(localName = "TR")
+        @JacksonXmlElementWrapper(localName = "TR", useWrapping = false)
+        @JacksonXmlProperty(localName = "TD")
         private List<TableRow> rows;
     }
 
     @Getter
     @Setter
     @NoArgsConstructor
-    @ToString
     public static class TableRow {
-
-        @JacksonXmlProperty(localName = "TD")
+        @JacksonXmlElementWrapper(localName = "TD", useWrapping = false)
         private List<TableCell> cells;
     }
 
     @Getter
     @Setter
     @NoArgsConstructor
-    @ToString
     public static class TableCell {
-
-        @JacksonXmlProperty(localName = "WIDTH")
+        @JacksonXmlProperty(isAttribute = true, localName = "WIDTH")
         private String width;
 
         @JacksonXmlText
