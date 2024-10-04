@@ -1,0 +1,11 @@
+# @name Upbit WebSocket 연결 API
+POST http://localhost:19096/connect-websocket
+Content-Type: application/json
+
+###
+
+# @name Upbit WebSocket 해제 API
+POST http://localhost:19096/disconnect-websocket
+Content-Type: application/json
+
+###

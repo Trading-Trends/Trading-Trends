@@ -5,10 +5,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
-import org.apache.kafka.common.protocol.types.Field.Str;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.Map;
 
 @Slf4j
@@ -17,6 +18,7 @@ import java.util.Map;
 public class MarketDataConsumer {
 
     private final ObjectMapper objectMapper;
+    private final RedisTemplate<String, Object> redisTemplate;
 
     // Kafka 메시지 수신 및 처리
     @KafkaListener(topics = "upbit-data", groupId = "market-group")
@@ -34,6 +36,19 @@ public class MarketDataConsumer {
             if (parsedData.containsKey("market")) {
                 String marketCode = (String) parsedData.get("market");
                 log.info("Market Code: {}", marketCode);
+
+                // Redis에 해당 marketCode 데이터를 저장
+                Map<String, Object> marketData = new HashMap<>();
+                marketData.put("tradePrice", parsedData.get("tradePrice"));
+                marketData.put("signedChangePrice", parsedData.get("signedChangePrice"));
+                marketData.put("signedChangeRate", parsedData.get("signedChangeRate"));
+
+                redisTemplate.opsForHash().putAll(marketCode, marketData);
+                log.info("Market Code in Redis : {}", marketCode);
+
+                // Redis에 저장된 데이터 로그 확인
+                Map<Object, Object> cachedData = redisTemplate.opsForHash().entries(marketCode);
+                log.info("Redis Data: {}", cachedData);
             }
         } catch (JsonProcessingException e) {
             // JSON 역직렬화 실패 처리
