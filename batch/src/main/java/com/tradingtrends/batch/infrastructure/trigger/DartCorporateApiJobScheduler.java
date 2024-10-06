@@ -12,18 +12,24 @@ import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
 import org.springframework.batch.core.repository.JobRestartException;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 @Component
-@RequiredArgsConstructor
 @Slf4j
 public class DartCorporateApiJobScheduler {
 
     private final Job job;
     private final JobLauncher jobLauncher;
 
-    @Scheduled(cron = "22 5 11 * * *", zone = "Asia/Seoul")
+    public DartCorporateApiJobScheduler(@Qualifier("dartApiJob") Job job, JobLauncher jobLauncher) {
+        this.job = job;
+        this.jobLauncher = jobLauncher;
+    }
+
+    @Scheduled(cron = "0 42 20 * * *", zone = "Asia/Seoul")
+
     public void scheduleDartApiJob() {
         log.info("Scheduled Dart API Job started at: {}", System.currentTimeMillis());
         this.schedulerRun(this.job);

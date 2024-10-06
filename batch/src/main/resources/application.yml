@@ -16,15 +16,17 @@ spring:
 
   batch:
     jdbc:
-      initialize-schema: never
+      initialize-schema: always
+  elasticsearch:
+    uris: 0.0.0.0:9200
 
-#  elasticsearch:
-#    uris: http://localhost:9200
 
-#eureka:
-#  client:
-#    service-url:
-#      defaultZone: http://localhost:19090/eureka/
+
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:19090/eureka/
 
 
 dart:

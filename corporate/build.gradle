@@ -28,7 +28,8 @@ ext {
 }
 
 dependencies {
-	implementation 'org.springframework.boot:spring-boot-starter-data-elasticsearch'
+	implementation 'org.elasticsearch.client:elasticsearch-rest-client:7.17.9'
+	implementation 'org.elasticsearch:elasticsearch:7.17.9'
 }
 
 dependencyManagement {
