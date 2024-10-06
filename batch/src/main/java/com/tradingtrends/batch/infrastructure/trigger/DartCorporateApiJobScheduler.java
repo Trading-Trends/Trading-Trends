@@ -29,6 +29,7 @@ public class DartCorporateApiJobScheduler {
     }
 
     @Scheduled(cron = "0 42 20 * * *", zone = "Asia/Seoul")
+
     public void scheduleDartApiJob() {
         log.info("Scheduled Dart API Job started at: {}", System.currentTimeMillis());
         this.schedulerRun(this.job);
