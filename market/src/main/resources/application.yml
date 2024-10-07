@@ -19,6 +19,11 @@ spring:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer # Kafka 메시지의 키를 문자열로 직렬화
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer # Kafka 메세지의 값을 JSON으로 직렬화
 
+  data:
+    redis:
+      host: localhost
+      port: 26379
+      password: systempass
 eureka:
   client:
     service-url:

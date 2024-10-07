@@ -43,12 +43,14 @@ public class MarketDataConsumer {
                 marketData.put("signedChangePrice", parsedData.get("signedChangePrice"));
                 marketData.put("signedChangeRate", parsedData.get("signedChangeRate"));
 
-                redisTemplate.opsForHash().putAll(marketCode, marketData);
-                log.info("Market Code in Redis : {}", marketCode);
+                redisTemplate.convertAndSend(marketCode, marketData);
 
-                // Redis에 저장된 데이터 로그 확인
-                Map<Object, Object> cachedData = redisTemplate.opsForHash().entries(marketCode);
-                log.info("Redis Data: {}", cachedData);
+//                redisTemplate.opsForHash().putAll(marketCode, marketData);
+//                log.info("Market Code in Redis : {}", marketCode);
+//
+//                // Redis에 저장된 데이터 로그 확인
+//                Map<Object, Object> cachedData = redisTemplate.opsForHash().entries(marketCode);
+//                log.info("Redis Data: {}", cachedData);
             }
         } catch (JsonProcessingException e) {
             // JSON 역직렬화 실패 처리
