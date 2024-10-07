@@ -55,6 +55,8 @@ public class BatchConfig {
         return new StepBuilder("fetchAndStoreDisclosures", jobRepository)
                 .tasklet((contribution, chunkContext) -> {
                     List<Disclosure> disclosures = dartDisclosureService.fetchDisclosuresToday();
+                    chunkContext.getStepContext().getStepExecution().getJobExecution()
+                            .getExecutionContext().put("disclosures", disclosures);
                     disclosureRepository.saveAll(disclosures);
                     return RepeatStatus.FINISHED;
                 }, transactionManager)
@@ -65,14 +67,17 @@ public class BatchConfig {
     public Step step2() {
         return new StepBuilder("fetchAndStoreDocuments", jobRepository)
                 .tasklet((contribution, chunkContext) -> {
-                    List<String> rceptNos = disclosureRepository.findRceptNosForToday();
-                    List<String> reprt_codes = List.of("11013", "11012", "11014", "11011");
-                    for (String rceptNo : rceptNos) {
-                            dartToElasticsearchService.fetchDocumentAndSaveToElasticsearch(rceptNo);
+                    // Step1에서 저장한 데이터 가져오기
+                    List<Disclosure> disclosures = (List<Disclosure>) chunkContext.getStepContext()
+                            .getStepExecution().getJobExecution().getExecutionContext().get("disclosures");
+
+                    for (Disclosure disclosure : disclosures) {
+                        dartToElasticsearchService.fetchDocumentAndSaveToElasticsearch(disclosure.getRceptNo(), disclosure);
                     }
                     return RepeatStatus.FINISHED;
                 }, transactionManager)
                 .build();
     }
+
 }
 
