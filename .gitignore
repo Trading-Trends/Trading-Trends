@@ -40,6 +40,6 @@ out/
 /postgres_data/**
 
 ### dotenv ###
-stock/.env.dev
 .env
-stock/.env.dev
+.env.dev
+.env.**
