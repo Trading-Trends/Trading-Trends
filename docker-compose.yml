@@ -22,87 +22,139 @@ services:
     ports:
       - "26379:6379"  # 바인딩할 포트:내부 포트
 
-  zookeeper:
+  coin-zookeeper:
     image: confluentinc/cp-zookeeper:latest
-    container_name: tt-zookeeper
+    container_name: coin-zookeeper
     ports:
       - "2181:2181"
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_SERVER_ID: 1
 
-  kafka1:
+  stock-zookeeper:
+    image: confluentinc/cp-zookeeper:latest
+    container_name: stock-zookeeper
+    ports:
+      - "2182:2181"  # 주식 서비스용 주키퍼는 포트를 2182로 사용
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_SERVER_ID: 2
+
+  coin-kafka1:
     image: confluentinc/cp-kafka:latest
-    container_name: tt-kafka1
+    container_name: coin-kafka1
     ports:
       - "9092:9092"
       - "29092:29092"
     environment:
       KAFKA_BROKER_ID: 1
-      KAFKA_ZOOKEEPER_CONNECT: "zookeeper:2181"
-      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka1:19092,EXTERNAL://${DOCKER_HOST_IP:-127.0.0.1}:9092,DOCKER://host.docker.internal:29092
+      KAFKA_ZOOKEEPER_CONNECT: "coin-zookeeper:2181"
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://coin-kafka1:19092,EXTERNAL://${DOCKER_HOST_IP:-127.0.0.1}:9092,DOCKER://host.docker.internal:29092
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT,DOCKER:PLAINTEXT
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
     depends_on:
-      - zookeeper
+      - coin-zookeeper
 
-  kafka2:
+  coin-kafka2:
     image: confluentinc/cp-kafka:latest
-    container_name: tt-kafka2
+    container_name: coin-kafka2
     ports:
       - "9093:9093"
       - "29093:29093"
     environment:
       KAFKA_BROKER_ID: 2
-      KAFKA_ZOOKEEPER_CONNECT: "zookeeper:2181"
-      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka2:19093,EXTERNAL://${DOCKER_HOST_IP:-127.0.0.1}:9093,DOCKER://host.docker.internal:29093
+      KAFKA_ZOOKEEPER_CONNECT: "coin-zookeeper:2181"
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://coin-kafka2:19093,EXTERNAL://${DOCKER_HOST_IP:-127.0.0.1}:9093,DOCKER://host.docker.internal:29093
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT,DOCKER:PLAINTEXT
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
     depends_on:
-      - zookeeper
+      - coin-zookeeper
 
-  kafka3:
+  coin-kafka3:
     image: confluentinc/cp-kafka:latest
-    container_name: tt-kafka3
+    container_name: coin-kafka3
     ports:
       - "9094:9094"
       - "29094:29094"
     environment:
       KAFKA_BROKER_ID: 3
-      KAFKA_ZOOKEEPER_CONNECT: "zookeeper:2181"
-      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka3:19094,EXTERNAL://${DOCKER_HOST_IP:-127.0.0.1}:9094,DOCKER://host.docker.internal:29094
+      KAFKA_ZOOKEEPER_CONNECT: "coin-zookeeper:2181"
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://coin-kafka3:19094,EXTERNAL://${DOCKER_HOST_IP:-127.0.0.1}:9094,DOCKER://host.docker.internal:29094
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT,DOCKER:PLAINTEXT
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
     depends_on:
-      - zookeeper
+      - coin-zookeeper
 
-#  kafdrop:
-#    image: obsidiandynamics/kafdrop
-#    restart: "no"
-#    ports:
-#      - "9000:9000"
-#    environment:
-#      KAFKA_BROKER_CONNECT: "kafka1:19092"
-#    depends_on:
-#      - kafka1
-#      - kafka2
-#      - kafka3
+  stock-kafka1:
+    image: confluentinc/cp-kafka:latest
+    container_name: stock-kafka1
+    ports:
+      - "9095:9095"
+      - "29095:29095"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: "stock-zookeeper:2181"
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://stock-kafka1:19095,EXTERNAL://${DOCKER_HOST_IP:-127.0.0.1}:9095,DOCKER://host.docker.internal:29095
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT,DOCKER:PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+    depends_on:
+      - stock-zookeeper
+
+  stock-kafka2:
+    image: confluentinc/cp-kafka:latest
+    container_name: stock-kafka2
+    ports:
+      - "9096:9096"
+      - "29096:29096"
+    environment:
+      KAFKA_BROKER_ID: 2
+      KAFKA_ZOOKEEPER_CONNECT: "stock-zookeeper:2181"
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://stock-kafka2:19096,EXTERNAL://${DOCKER_HOST_IP:-127.0.0.1}:9096,DOCKER://host.docker.internal:29096
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT,DOCKER:PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+    depends_on:
+      - stock-zookeeper
+
+  stock-kafka3:
+    image: confluentinc/cp-kafka:latest
+    container_name: stock-kafka3
+    ports:
+      - "9097:9097"
+      - "29097:29097"
+    environment:
+      KAFKA_BROKER_ID: 3
+      KAFKA_ZOOKEEPER_CONNECT: "stock-zookeeper:2181"
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://stock-kafka3:19097,EXTERNAL://${DOCKER_HOST_IP:-127.0.0.1}:9097,DOCKER://host.docker.internal:29097
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT,DOCKER:PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+    depends_on:
+      - stock-zookeeper
+
   kafka-ui:
     image: provectuslabs/kafka-ui:latest
     container_name: tt-kafka-ui
     depends_on:
-      - kafka1
-      - kafka2
-      - kafka3
+      - coin-kafka1
+      - coin-kafka2
+      - coin-kafka3
+      - stock-kafka1
+      - stock-kafka2
+      - stock-kafka3
     ports:
       - "8080:8080"
     environment:
-      KAFKA_CLUSTERS_0_NAME: local
-      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka1:29092,kafka2:29093,kafka3:29094
-      KAFKA_CLUSTERS_0_ZOOKEEPER: zookeeper:2181
+      KAFKA_CLUSTERS_0_NAME: coin
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: coin-kafka1:29092,coin-kafka2:29093,coin-kafka3:29094
+      KAFKA_CLUSTERS_1_NAME: stock
+      KAFKA_CLUSTERS_1_BOOTSTRAPSERVERS: stock-kafka1:29095,stock-kafka2:29096,stock-kafka3:29097
+      KAFKA_CLUSTERS_0_ZOOKEEPER: coin-zookeeper:2181
+      KAFKA_CLUSTERS_1_ZOOKEEPER: stock-zookeeper:2181
 
   zipkin:
     image: openzipkin/zipkin:latest
