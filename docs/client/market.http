@@ -9,3 +9,32 @@ POST http://localhost:19096/disconnect-websocket
 Content-Type: application/json
 
 ###
+
+# @name 한국투자증권 WebSocket approvalKey 발급 API
+GET http://localhost:19095/get-approval-key
+Content-Type: application/json
+
+###
+
+## 삼성전자 : 005930
+
+# @name Stock WebSocket 연결 API
+POST http://localhost:19095/connect-websocket
+Accept: application/json
+Content-Type: application/json
+approval_key: 05eeb26d-3e91-48b0-b13f-62ffd053efaf
+custtype: P
+tr_type: 1
+
+{
+  "tr_id": "H0STCNT0",
+  "tr_key": "005930"
+}
+
+###
+
+# @name Stock WebSocket 해제 API
+POST http://localhost:19095/disconnect-websocket
+Content-Type: application/json
+
+###
