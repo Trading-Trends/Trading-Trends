@@ -21,9 +21,23 @@ spring:
 
   data:
     redis:
-      host: localhost
-      port: 26379
-      password: systempass
+      sentinel:
+        master: mymaster # Sentinel에서 모니터링하는 마스터 Redis의 이름, 논리적인 이름
+        nodes: # Sentinel 노드의 리스트 (호스트와 포트 번호)
+          - localhost:26379
+          - localhost:26380
+          - localhost:26381
+      password: ""  # Redis에 설정된 비밀번호
+      lettuce:
+        pool:
+          max-active: 8  # 최대 연결 수
+          max-idle: 8  # 최대 유휴 연결 수
+          min-idle: 0  # 최소 유휴 연결 수
+          time-between-eviction-runs: 60000  # 연결 풀에서 유휴 연결을 제거할 시간 간격 (밀리초)
+          max-wait: 5000  # 연결 풀에서 연결을 기다릴 최대 시간 (밀리초)
+
+
+
 eureka:
   client:
     service-url:
