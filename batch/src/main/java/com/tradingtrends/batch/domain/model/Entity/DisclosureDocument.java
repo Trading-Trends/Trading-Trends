@@ -7,6 +7,8 @@ import lombok.ToString;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.*;
 
+import java.time.LocalDateTime;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -28,11 +30,11 @@ public class DisclosureDocument {
     @Field(type = FieldType.Text)
     private String reportNm;
 
-    @Field(type = FieldType.Date, format = DateFormat.date)
+    @Field(type = FieldType.Text)
     private String rceptDt;
 
     @Field(type = FieldType.Date, format = DateFormat.date_time)
-    private String loadDt;
+    private LocalDateTime loadDt;
 
     @Field(type = FieldType.Text)
     private String rawXmlData;  // XML 원본 데이터를 저장
