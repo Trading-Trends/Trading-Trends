@@ -38,3 +38,8 @@ out/
 
 ### data ###
 /postgres_data/**
+
+### dotenv ###
+.env
+.env.dev
+.env.**
