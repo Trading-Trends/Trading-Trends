@@ -6,7 +6,7 @@ spring:
     name: market
 
   kafka:
-    bootstrap-servers: localhost:9092,localhost:9093,localhost:9094
+    bootstrap-servers: localhost:9092,localhost:9093,localhost:9094,localhost:9095,localhost:9096,localhost:9097
     consumer:
       group-id: market-group
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer # Kafka 메세지의 키를 문자열로 역직렬화
