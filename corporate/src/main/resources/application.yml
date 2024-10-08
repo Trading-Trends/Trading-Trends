@@ -5,6 +5,21 @@ spring:
   application:
     name: corporate
 
+  datasource:
+    url: jdbc:postgresql://localhost:25432/tradingtrends
+    username: crp
+    password: 1234
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+
 eureka:
   client:
     service-url:
