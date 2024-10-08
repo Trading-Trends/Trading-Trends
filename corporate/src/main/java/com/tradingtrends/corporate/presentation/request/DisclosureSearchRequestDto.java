@@ -1,4 +1,4 @@
-package com.tradingtrends.batch.presentation.request;
+package com.tradingtrends.corporate.presentation.request;
 
 import jakarta.validation.constraints.AssertTrue;
 import lombok.AllArgsConstructor;

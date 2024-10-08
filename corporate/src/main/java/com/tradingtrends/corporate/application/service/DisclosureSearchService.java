@@ -1,11 +1,12 @@
-package com.tradingtrends.batch.application.service;
+package com.tradingtrends.corporate.application.service;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch.core.SearchRequest;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
 import co.elastic.clients.elasticsearch.core.search.Hit;
-import com.tradingtrends.batch.domain.model.Entity.DisclosureDocument;
-import com.tradingtrends.batch.presentation.request.DisclosureSearchRequestDto;
+import com.tradingtrends.corporate.domain.model.entity.DisclosureDocument;
+import com.tradingtrends.corporate.presentation.request.DisclosureSearchRequestDto;
+import com.tradingtrends.corporate.application.dto.DisclosureResponseDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -23,7 +25,7 @@ public class DisclosureSearchService {
     private final ElasticsearchClient elasticsearchClient;
 
     // corpName, reportNm, rceptDt를 사용한 검색 기능 (기간 범위 포함)
-    public List<DisclosureDocument> searchDisclosure(DisclosureSearchRequestDto requestDto) throws IOException {
+    public List<DisclosureResponseDto> searchDisclosure(DisclosureSearchRequestDto requestDto) throws IOException {
         // bool 쿼리에 조건을 추가할 리스트
         List<co.elastic.clients.elasticsearch._types.query_dsl.Query> queries = new ArrayList<>();
         String corpName = requestDto.getCorpName();
@@ -56,7 +58,6 @@ public class DisclosureSearchService {
             ));
         }
 
-
         // 검색 요청을 구성
         SearchRequest searchRequest = SearchRequest.of(s -> s
                 .index("disclosures")
@@ -74,11 +75,14 @@ public class DisclosureSearchService {
         SearchResponse<DisclosureDocument> searchResponse = elasticsearchClient.search(searchRequest, DisclosureDocument.class);
         List<Hit<DisclosureDocument>> hits = searchResponse.hits().hits();
 
-        return hits.stream().map(Hit::source).collect(Collectors.toList());
+        return hits.stream()
+                .map(Hit::source).filter(Objects::nonNull)
+                .map(DisclosureResponseDto::fromEntity)
+                .collect(Collectors.toList());
     }
 
     // rceptNo를 사용하여 보고서 상세 조회 기능
-    public DisclosureDocument getDisclosureById(String corporateReportId) throws IOException {
+    public DisclosureResponseDto getDisclosureById(String corporateReportId) throws IOException {
         // Elasticsearch에서 특정 문서를 조회
         var getRequest = co.elastic.clients.elasticsearch.core.GetRequest.of(g -> g
                 .index("disclosures")   // 인덱스명
@@ -90,7 +94,7 @@ public class DisclosureSearchService {
 
         // 조회된 문서가 있을 경우 반환, 없으면 null
         if (getResponse.found()) {
-            return getResponse.source();
+            return DisclosureResponseDto.fromEntity(getResponse.source());
         } else {
             log.warn("DisclosureDocument with rceptNo [{}] not found.", corporateReportId);
             return null;
