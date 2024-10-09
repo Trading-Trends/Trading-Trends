@@ -7,7 +7,7 @@ spring:
 
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:25432/postgres
+    url: jdbc:postgresql://localhost:25432/tradingtrends
     username: coi
     password: 1234
 
@@ -34,6 +34,22 @@ spring:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer # Kafka 메시지의 키를 문자열로 직렬화
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer # Kafka 메세지의 값을 JSON으로 직렬화
 
+  data:
+    redis:
+      sentinel:
+        master: mymaster # Sentinel에서 모니터링하는 마스터 Redis의 이름, 논리적인 이름
+        nodes: # Sentinel 노드의 리스트 (호스트와 포트 번호)
+          - localhost:26379
+          - localhost:26380
+          - localhost:26381
+      password: ""  # Redis에 설정된 비밀번호
+      lettuce:
+        pool:
+          max-active: 8  # 최대 연결 수
+          max-idle: 8  # 최대 유휴 연결 수
+          min-idle: 0  # 최소 유휴 연결 수
+          time-between-eviction-runs: 60000  # 연결 풀에서 유휴 연결을 제거할 시간 간격 (밀리초)
+          max-wait: 5000  # 연결 풀에서 연결을 기다릴 최대 시간 (밀리초)
 #eureka:
 #  client:
 #    service-url:

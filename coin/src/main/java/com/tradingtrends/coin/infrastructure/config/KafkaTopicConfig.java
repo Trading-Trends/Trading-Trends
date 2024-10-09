@@ -1,6 +1,6 @@
 package com.tradingtrends.coin.infrastructure.config;
 
-import com.tradingtrends.coin.infrastructure.CoinTopic;
+import com.tradingtrends.coin.infrastructure.messaging.CoinTopic;
 import java.util.HashMap;
 import java.util.Map;
 import org.apache.kafka.clients.admin.AdminClientConfig;
