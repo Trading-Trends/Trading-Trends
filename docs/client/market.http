@@ -11,14 +11,14 @@ Content-Type: application/json
 ###
 
 # @name 한국투자증권 WebSocket approvalKey 발급 API
-GET http://localhost:19095/get-approval-key
+GET http://localhost:19095/stock/get-approval-key
 Content-Type: application/json
 
 ###
 
 ## 코스피 100 : https://index.krx.co.kr/contents/MKD/03/0304/03040101/MKD03040101.jsp?upmidCd=0102&idxCd=1034&idxId=K2G02P#a110dc6b3a1678330158473e0d0ffbf0=3
 # @name Stock WebSocket 연결 API
-POST http://localhost:19095/connect-websocket
+POST http://localhost:19095/stock/connect-websocket
 Accept: application/json
 Content-Type: application/json
 approval_key: 716b31e9-da2c-4e6d-8637-47390ff75e39
@@ -33,7 +33,7 @@ tr_type: 1
 ###
 
 # @name Stock WebSocket 해제 API
-POST http://localhost:19095/disconnect-websocket
+POST http://localhost:19095/stock/disconnect-websocket
 Content-Type: application/json
 
 ###
