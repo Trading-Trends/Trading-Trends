@@ -16,12 +16,11 @@ import java.util.Map;
 @Service
 @RequiredArgsConstructor
 public class MarketDataConsumer {
-
     private final ObjectMapper objectMapper;
     private final RedisTemplate<String, Object> redisTemplate;
 
     // Kafka 메시지 수신 및 처리
-    @KafkaListener(topics = "upbit-data", groupId = "market-group")
+    @KafkaListener(topics = "upbit-data", groupId = "coin-group")
     public void listener(ConsumerRecord<String, String> data) {
         log.info("Received message: {}", data.toString());
 
@@ -55,6 +54,34 @@ public class MarketDataConsumer {
         } catch (JsonProcessingException e) {
             // JSON 역직렬화 실패 처리
             log.error("Failed to deserialize message", e);
+        }
+    }
+
+    // 주식 데이터 처리
+    @KafkaListener(topics = "stock-data", groupId = "stock-group")
+    public void stockDataListener(ConsumerRecord<String, String> data) {
+        log.info("Received stock data: {}", data.toString());
+
+        try {
+            // JSON 데이터를 객체로 변환
+            Map<String, String> parsedData = objectMapper.readValue(data.value(), Map.class);
+
+            log.info("Parsed Stock Data: {}", parsedData);
+
+            // 주식 데이터 처리 로직
+            if (parsedData.containsKey("stockCode")) {
+                String stockCode = parsedData.get("stockCode");
+                log.info("Stock Code: {}", stockCode);
+
+                Map<String, Object> stockData = new HashMap<>();
+                stockData.put("currentPrice", parsedData.get("currentPrice"));
+                stockData.put("priceChange", parsedData.get("priceChange"));
+                stockData.put("changeRate", parsedData.get("changeRate"));
+
+                redisTemplate.convertAndSend(stockCode, stockData);
+            }
+        } catch (JsonProcessingException e) {
+            log.error("Failed to deserialize stock data", e);
         }
     }
 }
