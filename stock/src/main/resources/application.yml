@@ -5,6 +5,22 @@ spring:
   application:
     name: stock
 
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:25432/tradingtrends
+    username: stc
+    password: 1234
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    properties:
+      hibernate:
+        show_sql: true
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        default_batch_fetch_size: 1000
+
   kafka:
     bootstrap-servers: localhost:9095,localhost:9096,localhost:9097
     consumer:
