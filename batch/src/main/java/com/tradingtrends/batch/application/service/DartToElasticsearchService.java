@@ -49,6 +49,7 @@ public class DartToElasticsearchService {
             // ES용 엔티티 생성 및 매핑
             DisclosureDocument document = new DisclosureDocument();
             document.setRawXmlData(xmlContent);
+            document.setRceptNo(rceptNo);
             document.setCorpName(disclosure.getCorpName());
             document.setCorpCode(disclosure.getCorpCode());
             document.setReportNm(disclosure.getReportNm());
