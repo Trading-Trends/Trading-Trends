@@ -16,12 +16,11 @@ import java.util.Map;
 @Service
 @RequiredArgsConstructor
 public class MarketDataConsumer {
-
     private final ObjectMapper objectMapper;
     private final RedisTemplate<String, Object> redisTemplate;
 
     // Kafka 메시지 수신 및 처리
-    @KafkaListener(topics = "upbit-data", groupId = "market-group")
+    @KafkaListener(topics = "upbit-data", groupId = "coin-group")
     public void listener(ConsumerRecord<String, String> data) {
         log.info("Received message: {}", data.toString());
 
@@ -59,7 +58,7 @@ public class MarketDataConsumer {
     }
 
     // 주식 데이터 처리
-    @KafkaListener(topics = "stock-data", groupId = "market-group")
+    @KafkaListener(topics = "stock-data", groupId = "stock-group")
     public void stockDataListener(ConsumerRecord<String, String> data) {
         log.info("Received stock data: {}", data.toString());
 

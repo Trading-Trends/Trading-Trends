@@ -6,7 +6,7 @@ spring:
     name: market
 
   kafka:
-    bootstrap-servers: localhost:9092,localhost:9093,localhost:9094,localhost:9095,localhost:9096,localhost:9097
+    bootstrap-servers: localhost:9092,localhost:9093,localhost:9094
     consumer:
       group-id: market-group
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer # Kafka 메세지의 키를 문자열로 역직렬화
@@ -15,9 +15,10 @@ spring:
       properties:
         spring.json.trusted.packages: '*'
         allow.auto.create.topic: false # 코드에서 토픽 자동 생성을 막음
-    producer:
-      key-serializer: org.apache.kafka.common.serialization.StringSerializer # Kafka 메시지의 키를 문자열로 직렬화
-      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer # Kafka 메세지의 값을 JSON으로 직렬화
+    coin-consumer: # 코인 데이터용 consumer 설정
+      group-id: coin-group
+    stock-consumer: # 주식 데이터용 consumer 설정
+      group-id: stock-group
 
   data:
     redis:
