@@ -1,4 +1,4 @@
-package com.tradingtrends.batch.domain.model.Entity;
+package com.tradingtrends.corporate.domain.model.entity;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;

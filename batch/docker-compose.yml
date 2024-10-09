@@ -23,6 +23,8 @@ services:
       - es-data:/usr/share/elasticsearch/data
     networks:
       - elk
+    command: >
+      bash -c "elasticsearch-plugin install analysis-nori && exec elasticsearch"
 
   logstash:
     image: docker.elastic.co/logstash/logstash:8.15.2
