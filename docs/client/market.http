@@ -37,3 +37,9 @@ POST http://localhost:19095/stock/disconnect-websocket
 Content-Type: application/json
 
 ###
+
+# @name 한국투자증권 OAuth Token 발급 API
+GET http://localhost:19095/stock/token
+Content-Type: application/json
+
+###
