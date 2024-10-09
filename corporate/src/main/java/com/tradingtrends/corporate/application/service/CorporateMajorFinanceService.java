@@ -2,7 +2,7 @@ package com.tradingtrends.corporate.application.service;
 
 import com.tradingtrends.corporate.application.dto.CorporateMajorFinanceResponseDto;
 import com.tradingtrends.corporate.application.dto.CorporateMajorFinanceSearchRequestDto;
-import com.tradingtrends.corporate.domain.model.entity.CorporateMajorFinance;
+import com.tradingtrends.corporate.domain.model.CorporateMajorFinance;
 import com.tradingtrends.corporate.domain.repository.CorporateMajorFinanceRepository;
 import com.tradingtrends.corporate.domain.specification.CorporateMajorFinanceSpecification;
 import lombok.RequiredArgsConstructor;

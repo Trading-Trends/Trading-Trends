@@ -1,6 +1,6 @@
 package com.tradingtrends.corporate.application.dto;
 
-import com.tradingtrends.corporate.domain.model.entity.CorporateMajorFinance;
+import com.tradingtrends.corporate.domain.model.CorporateMajorFinance;
 import lombok.Getter;
 import lombok.Setter;
 

@@ -1,4 +1,4 @@
-package com.tradingtrends.corporate.domain.model.entity;
+package com.tradingtrends.corporate.domain.model;
 
 import jakarta.persistence.*;
 import lombok.Getter;
