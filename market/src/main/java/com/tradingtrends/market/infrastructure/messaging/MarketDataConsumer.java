@@ -29,32 +29,34 @@ public class MarketDataConsumer {
             // JSON 데이터를 객체로 변환
             Map<String, String> parsedData = objectMapper.readValue(data.value(), Map.class);
 
-            // 데이터를 처리하거나 필요에 따라 로직 추가
-            log.info("Parsed Data: {}", parsedData);
-
-            // 예: 특정 필드가 있는지 확인하고 처리
+            // 특정 필드가 있는지 확인하고 처리
             if (parsedData.containsKey("market")) {
-                String marketCode = (String) parsedData.get("market");
+                String marketCode = parsedData.get("market");
                 log.info("Market Code: {}", marketCode);
 
-                // Redis에 해당 marketCode 데이터를 저장
-                Map<String, Object> marketData = new HashMap<>();
-                marketData.put("tradePrice", parsedData.get("tradePrice"));
-                marketData.put("signedChangePrice", parsedData.get("signedChangePrice"));
-                marketData.put("signedChangeRate", parsedData.get("signedChangeRate"));
+                // 유저 구독 정보를 확인하여 필요한 종목의 데이터만 처리
+                if (isMarketSubscribed(marketCode)) {
+                    Map<String, Object> marketData = new HashMap<>();
+                    marketData.put("tradePrice", parsedData.get("tradePrice"));
+                    marketData.put("signedChangePrice", parsedData.get("signedChangePrice"));
+                    marketData.put("signedChangeRate", parsedData.get("signedChangeRate"));
 
-                redisTemplate.convertAndSend(marketCode, marketData);
-
-//                redisTemplate.opsForHash().putAll(marketCode, marketData);
-//                log.info("Market Code in Redis : {}", marketCode);
-//
-//                // Redis에 저장된 데이터 로그 확인
-//                Map<Object, Object> cachedData = redisTemplate.opsForHash().entries(marketCode);
-//                log.info("Redis Data: {}", cachedData);
+                    // Redis Pub/Sub으로 데이터 전송
+                    redisTemplate.convertAndSend(marketCode, marketData);
+                    log.info("Channel has been successfully published for market: {}", marketCode);
+                } else {
+                    log.info("No subscribers for market: {}, skipping Redis publish.", marketCode);
+                }
             }
-        } catch (JsonProcessingException e) {
+        } catch (Exception e) {
             // JSON 역직렬화 실패 처리
             log.error("Failed to deserialize message", e);
         }
+    }
+
+    private boolean isMarketSubscribed(String marketCode) {
+        // Redis에서 해당 종목에 구독된 유저가 있는지 확인하는 로직
+        Boolean hasSubscribers = redisTemplate.hasKey("market:" + marketCode + ":subscribers");
+        return Boolean.TRUE.equals(hasSubscribers);
     }
 }
