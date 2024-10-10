@@ -21,12 +21,12 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder(access = AccessLevel.PRIVATE)
 @Entity
-@Table(name = "P_CORPORATE_FINANCE", schema = "s_corporate")
-public class CorporateFinance {
+@Table(name = "P_CORPORATE_MAJOR_FINANCE", schema = "s_corporate")
+public class CorporateMajorFinance {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name = "corp_id")
+    @Column(name = "corporate_major_finance_id")
     private UUID id;
 
     private String bsnsYear;      // 사업 연도
@@ -39,7 +39,7 @@ public class CorporateFinance {
     private String idxNm;         // 지표명
     private String idxVal;        // 지표값
 
-    public CorporateFinance(CorporateFinanceDto dto) {
+    public CorporateMajorFinance(CorporateFinanceDto dto) {
         this.bsnsYear = dto.getBsns_year();
         this.corpCode = dto.getCorp_code();
         this.stockCode = dto.getStock_code();

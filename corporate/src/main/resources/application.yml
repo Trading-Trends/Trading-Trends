@@ -19,6 +19,8 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
+  elasticsearch:
+    uris: 0.0.0.0:9200
 
 eureka:
   client:

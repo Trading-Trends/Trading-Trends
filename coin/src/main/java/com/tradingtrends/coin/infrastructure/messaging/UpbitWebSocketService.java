@@ -2,7 +2,6 @@ package com.tradingtrends.coin.infrastructure.messaging;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.tradingtrends.coin.infrastructure.CoinTopic;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;

@@ -1,4 +1,4 @@
-package com.tradingtrends.coin.infrastructure;
+package com.tradingtrends.coin.infrastructure.messaging;
 
 public enum CoinTopic {
     UPBIT_DATA("upbit-data");

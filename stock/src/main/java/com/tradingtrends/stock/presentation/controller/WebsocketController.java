@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("/stock")
 public class WebsocketController {
     @Value("${stock-api.appkey}")
     private String appKey;

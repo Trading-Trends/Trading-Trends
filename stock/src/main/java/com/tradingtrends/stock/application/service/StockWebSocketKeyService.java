@@ -1,5 +1,6 @@
 package com.tradingtrends.stock.application.service;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -8,8 +9,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Service
+@RequiredArgsConstructor
 public class StockWebSocketKeyService {
-    private final RestTemplate restTemplate = new RestTemplate();
+    private final RestTemplate restTemplate;
     private static final String API_URL = "https://openapi.koreainvestment.com:9443/oauth2/Approval";
 
     public String getApprovalKey(String appKey, String appSecret) {

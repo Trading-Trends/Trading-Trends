@@ -1,6 +1,6 @@
 package com.tradingtrends.coin.application.service;
 
-import com.tradingtrends.coin.infrastructure.CoinTopic;
+import com.tradingtrends.coin.infrastructure.messaging.CoinTopic;
 import jakarta.annotation.PreDestroy;
 import java.util.Arrays;
 import java.util.Properties;
