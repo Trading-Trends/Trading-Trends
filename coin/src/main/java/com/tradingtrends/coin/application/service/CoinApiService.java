@@ -1,5 +1,7 @@
 package com.tradingtrends.coin.application.service;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tradingtrends.coin.application.dto.CoinApiResponseDto;
 import com.tradingtrends.coin.application.dto.CoinApiSnapshotResponseDto;
 import com.tradingtrends.coin.domain.model.CoinInfo;
@@ -13,7 +15,6 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -32,6 +33,7 @@ public class CoinApiService {
     private final CoinRepository coinRepository;
     private final RestTemplate restTemplate;
     private final RedisTemplate<String, Object> redisTemplate;
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Transactional
     public List<CoinApiResponseDto> fetchAndSaveCoinMarketInfoFromOpenAPI() {
@@ -102,13 +104,13 @@ public class CoinApiService {
             .collect(Collectors.toList());
 
         // 상위 5개 데이터 캐시 (전날 대비 상승폭이 큰 코인)
-        List<CoinApiSnapshotResponseDto> bestCoins = sortedByRate.subList(0,
-            Math.min(5, sortedByRate.size()));
+        List<CoinApiSnapshotResponseDto> bestCoins = new ArrayList<>(sortedByRate.subList(0,
+            Math.min(5, sortedByRate.size())));
         redisTemplate.opsForValue().set("bestCoinsFromPrevDay", bestCoins);
 
         // 하위 5개 데이터 캐시 (전날 대비 하락폭이 큰 코인)
-        List<CoinApiSnapshotResponseDto> worstCoins = sortedByRate.subList(
-            Math.max(0, sortedByRate.size() - 5), sortedByRate.size());
+        List<CoinApiSnapshotResponseDto> worstCoins = new ArrayList<>(sortedByRate.subList(
+            Math.max(0, sortedByRate.size() - 5), sortedByRate.size()));
         redisTemplate.opsForValue().set("worstCoinsFromPrevDay", worstCoins);
 
         // 필터링된 리스트 반환

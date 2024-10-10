@@ -40,7 +40,7 @@ public class CoinInfo {
      * 아래 1개 필드는 유의종목 지정 여부
      */
     @Column(name = "market_warning")
-    private boolean marketWarning;
+    private String marketWarning;
 
     /**
      * 아래 5개 필드는 주의종목 지정 여부
@@ -63,14 +63,14 @@ public class CoinInfo {
     public static CoinInfo createCoin(CoinApiResponseDto dto){
         return CoinInfo.builder()
             .market(dto.getMarket())
-            .koreanName(dto.getKoreanName())
-            .englishName(dto.getEnglishName())
-            .marketWarning(dto.isMarketWarning())
-            .priceFluctuationsWarning(dto.isPriceFluctuationsWarning())
-            .tradingVolumeSoaringWarning(dto.isTradingVolumeSoaringWarning())
-            .depositAmountSoaringWarning(dto.isDepositAmountSoaringWarning())
-            .globalPriceDifferencesWarning(dto.isGlobalPriceDifferencesWarning())
-            .concentrationOfSmallAccountsWarning(dto.isConcentrationOfSmallAccountsWarning())
+            .koreanName(dto.getKorean_name())
+            .englishName(dto.getEnglish_name())
+            .marketWarning(dto.getMarket_warning()) // market_warning이 "WARNING"일 경우 true로 설정
+            .priceFluctuationsWarning(dto.getMarket_event().getCaution().isPRICE_FLUCTUATIONS())
+            .tradingVolumeSoaringWarning(dto.getMarket_event().getCaution().isTRADING_VOLUME_SOARING())
+            .depositAmountSoaringWarning(dto.getMarket_event().getCaution().isDEPOSIT_AMOUNT_SOARING())
+            .globalPriceDifferencesWarning(dto.getMarket_event().getCaution().isGLOBAL_PRICE_DIFFERENCES())
+            .concentrationOfSmallAccountsWarning(dto.getMarket_event().getCaution().isCONCENTRATION_OF_SMALL_ACCOUNTS())
             .build();
     }
 }
