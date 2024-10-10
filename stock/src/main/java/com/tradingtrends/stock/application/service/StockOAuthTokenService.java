@@ -10,15 +10,15 @@ import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
-public class StockWebSocketKeyService {
+public class StockOAuthTokenService {
     private final RestTemplate restTemplate;
-    private static final String API_URL = "https://openapi.koreainvestment.com:9443/oauth2/Approval";
+    private static final String API_URL = "https://openapi.koreainvestment.com:9443/oauth2/tokenP";
 
-    public String getApprovalKey(String appKey, String appSecret) {
+    public String getAccessToken(String appKey, String appSecret) {
         Map<String, String> requestBody = new HashMap<>();
         requestBody.put("grant_type", "client_credentials");
         requestBody.put("appkey", appKey);
-        requestBody.put("secretkey", appSecret);
+        requestBody.put("appsecret", appSecret);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -26,6 +26,6 @@ public class StockWebSocketKeyService {
         HttpEntity<Map<String, String>> requestEntity = new HttpEntity<>(requestBody, headers);
 
         ResponseEntity<Map> response = restTemplate.exchange(API_URL, HttpMethod.POST, requestEntity, Map.class);
-        return (String) response.getBody().get("approval_key");
+        return (String) response.getBody().get("access_token");
     }
 }

@@ -11,14 +11,14 @@ Content-Type: application/json
 ###
 
 # @name 한국투자증권 WebSocket approvalKey 발급 API
-GET http://localhost:19095/get-approval-key
+GET http://localhost:19095/stock/get-approval-key
 Content-Type: application/json
 
 ###
 
 ## 코스피 100 : https://index.krx.co.kr/contents/MKD/03/0304/03040101/MKD03040101.jsp?upmidCd=0102&idxCd=1034&idxId=K2G02P#a110dc6b3a1678330158473e0d0ffbf0=3
 # @name Stock WebSocket 연결 API
-POST http://localhost:19095/connect-websocket
+POST http://localhost:19095/stock/connect-websocket
 Accept: application/json
 Content-Type: application/json
 approval_key: 716b31e9-da2c-4e6d-8637-47390ff75e39
@@ -33,7 +33,24 @@ tr_type: 1
 ###
 
 # @name Stock WebSocket 해제 API
-POST http://localhost:19095/disconnect-websocket
+POST http://localhost:19095/stock/disconnect-websocket
 Content-Type: application/json
 
+###
+
+# @name 한국투자증권 OAuth Token 발급 API
+GET http://localhost:19095/stock/token
+Content-Type: application/json
+
+###
+
+## 한국투자증권 주식기본조회 API : https://apiportal.koreainvestment.com/apiservice/apiservice-domestic-stock-information#L_da0485b5-31f1-4c62-a3d4-294a4311ad39
+# @name 한국투자증권 주식정보 저장 API
+POST http://localhost:19095/stock/info
+Content-Type: application/json
+
+{
+  "pdno": "282330,097950,005830,383220,078930,007070,009540,267250,329180,011200,105560,030200,033780,003550,034220,051900,373220,032640,011070,066570,051910,035420,005940,005490,010950,034730,011790,302440,326030,402340,361610,096770,017670,000660,035250,010130,001570,011780,000270,024110,251270,003490,454910,241560,034020,004990,011170,138040,006800,028050,006400,028260,207940,032830,018260,009150,005930,010140,016360,029780,000810,068270,055550,002790,090430,450080,036570,066970,271560,316140,000100,035720,323410,377300,021240,259960,022100,047050,003670,086790,352820,036460,071050,015760,161390,047810,042700,008930,128940,018880,180640,009830,012450,042660,000720,086280,012330,004020,005380,008770",
+  "prdtTypeCd": "300"
+}
 ###
