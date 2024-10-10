@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/coin")
 public class CoinApiController {
 
-    private CoinApiService coinApiService;
+    private final CoinApiService coinApiService;
 
     /**
      * 종목별 상세 정보 open api 이용 및 DB 저장
@@ -81,10 +81,11 @@ public class CoinApiController {
 
     /**
      * 코인 종목 다건 조회 (페이징 조회)
+     *         @PageableDefault(page = 0, size = 10, sort = "createdAt", direction = Direction.ASC) Pageable pageable
      */
     @GetMapping
     public ResponseEntity<Page<CoinApiResponseDto>> getCoinMarketInfos(
-        @PageableDefault(page = 0, size = 10, sort = "createdAt", direction = Direction.ASC) Pageable pageable
+        @PageableDefault(page = 0, size = 10, direction = Direction.ASC) Pageable pageable
     ){
         return ResponseEntity.status(HttpStatus.OK).body(coinApiService.getCoinMarketInfos(pageable));
     }

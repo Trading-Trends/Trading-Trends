@@ -45,7 +45,7 @@ public class CoinWatchlistController {
 
     @GetMapping
     public ResponseEntity<Page<CoinWatchlistResponseDto>> getCoinsWatchlist(
-        @PageableDefault(page = 0, size = 10, sort = "createdAt", direction = Direction.ASC) Pageable pageable
+        @PageableDefault(page = 0, size = 10, direction = Direction.ASC) Pageable pageable
     ){
         return ResponseEntity.status(HttpStatus.OK).body(coinWatchlistService.getCoinsWatchlist(pageable));
     }

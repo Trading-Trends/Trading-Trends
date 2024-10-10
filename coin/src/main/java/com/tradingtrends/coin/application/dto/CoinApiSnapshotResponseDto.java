@@ -5,30 +5,23 @@ import java.io.Serializable;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
+@Setter
 @NoArgsConstructor
-@AllArgsConstructor
 public class CoinApiSnapshotResponseDto implements Serializable {
 
+    @JsonProperty("market")
     private String market;
-    private double signedChangePrice;
-    private double signedChangeRate;
-    private double tradePrice;
 
-    // JSON 필드명과 다른 경우 @JsonProperty를 사용해 매핑
     @JsonProperty("signed_change_price")
-    public void setSignedChangePrice(double signedChangePrice) {
-        this.signedChangePrice = signedChangePrice;
-    }
+    private double signedChangePrice;
 
     @JsonProperty("signed_change_rate")
-    public void setSignedChangeRate(double signedChangeRate) {
-        this.signedChangeRate = signedChangeRate;
-    }
+    private double signedChangeRate;
 
     @JsonProperty("trade_price")
-    public void setTradePrice(double tradePrice) {
-        this.tradePrice = tradePrice;
-    }
+    private double tradePrice;
+
 }
