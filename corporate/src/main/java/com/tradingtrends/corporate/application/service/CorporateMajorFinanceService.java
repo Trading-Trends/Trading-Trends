@@ -17,8 +17,8 @@ import java.util.UUID;
 public class CorporateMajorFinanceService {
     private final CorporateMajorFinanceRepository corporateMajorFinanceRepository;
 
-    public CorporateMajorFinanceResponseDto getCorporationMajorFinance(UUID corpId) {
-        CorporateMajorFinance corporateMajorFinance = corporateMajorFinanceRepository.findById(corpId).orElseThrow(() -> new IllegalArgumentException("해당하는 기업주요재무지표가 없습니다."));
+    public CorporateMajorFinanceResponseDto getCorporationMajorFinance(UUID corporateMajorFinanceId) {
+        CorporateMajorFinance corporateMajorFinance = corporateMajorFinanceRepository.findById(corporateMajorFinanceId).orElseThrow(() -> new IllegalArgumentException("해당하는 기업주요재무지표가 없습니다."));
         CorporateMajorFinanceResponseDto corporateMajorFinanceResponseDto = new CorporateMajorFinanceResponseDto(corporateMajorFinance);
         return corporateMajorFinanceResponseDto;
     }

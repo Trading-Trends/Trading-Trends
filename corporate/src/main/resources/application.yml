@@ -6,7 +6,7 @@ spring:
     name: corporate
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/tradingtrends
+    url: jdbc:postgresql://localhost:25432/tradingtrends
     username: crp
     password: 1234
     driver-class-name: org.postgresql.Driver

@@ -31,7 +31,7 @@ public class InterestedCorporateController {
         return interestedCorporateService.deleteInterestedCorporate(userId, interested_corporate_id);
     }
 
-    @GetMapping
+    @GetMapping("/{user_id}")
     public Page<InterestedCorporateResponseDto> getInterestedCorporateList(@PathVariable("user_id") Long userId,
                                                                           @RequestParam(defaultValue = "1") int page,
                                                                           @RequestParam(defaultValue = "createdAt") String sort){

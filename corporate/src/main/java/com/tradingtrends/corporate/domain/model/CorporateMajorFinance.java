@@ -9,11 +9,11 @@ import java.util.UUID;
 @Getter
 @Setter
 @Entity
-@Table(name = "P_CORPORATE_FINANCE", schema = "s_corporate")
+@Table(name = "P_CORPORATE_MAJOR_FINANCE", schema = "s_corporate")
 public class CorporateMajorFinance {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name = "corp_id")
+    @Column(name = "corporate_major_finance_id")
     private UUID id;
     private String bsnsYear;      // 사업 연도
     private String corpCode;      // 고유번호
