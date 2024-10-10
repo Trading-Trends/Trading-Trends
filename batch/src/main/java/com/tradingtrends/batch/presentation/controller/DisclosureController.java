@@ -14,13 +14,13 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/dart-manual")
-public class DartManualController {
+@RequestMapping("/api/data-collection/disclosure")
+public class DisclosureController {
 
     private final DartDisclosureService dartDisclosureService;
     private final DartToElasticsearchService dartToElasticsearchService;
 
-    @GetMapping("/collectDisclosures")
+    @GetMapping
     public void collectDisclosures(@RequestParam String bgn_de, @RequestParam String end_de) throws IOException {
         // 1. 주어진 기간의 공시 데이터를 수집하고 저장
         List<Disclosure> disclosures= dartDisclosureService.fetchDisclosures(bgn_de, end_de);
