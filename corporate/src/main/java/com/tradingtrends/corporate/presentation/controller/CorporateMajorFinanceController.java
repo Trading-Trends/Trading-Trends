@@ -19,9 +19,9 @@ public class CorporateMajorFinanceController {
 
     private final CorporateMajorFinanceService corporateMajorFinanceService;
 
-    @GetMapping("/{corp_id}")
-    public CorporateMajorFinanceResponseDto getCorporationMajorFinance(@PathVariable(name = "corp_id") UUID corpId){
-        return corporateMajorFinanceService.getCorporationMajorFinance(corpId);
+    @GetMapping("/{corporate_major_finance_id}")
+    public CorporateMajorFinanceResponseDto getCorporationMajorFinance(@PathVariable(name = "corporate_major_finance_id") UUID corporateMajorFinanceId){
+        return corporateMajorFinanceService.getCorporationMajorFinance(corporateMajorFinanceId);
     }
 
     //검색 필드: corp_code, stock_code, bsns_year

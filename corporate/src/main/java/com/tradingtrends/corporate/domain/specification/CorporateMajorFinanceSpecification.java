@@ -1,7 +1,7 @@
 package com.tradingtrends.corporate.domain.specification;
 
 import com.tradingtrends.corporate.application.dto.CorporateMajorFinanceSearchRequestDto;
-import com.tradingtrends.corporate.domain.model.entity.CorporateMajorFinance;
+import com.tradingtrends.corporate.domain.model.CorporateMajorFinance;
 import jakarta.persistence.criteria.Predicate;
 import org.springframework.data.jpa.domain.Specification;
 

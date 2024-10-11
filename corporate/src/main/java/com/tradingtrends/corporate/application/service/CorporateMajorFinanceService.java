@@ -2,7 +2,7 @@ package com.tradingtrends.corporate.application.service;
 
 import com.tradingtrends.corporate.application.dto.CorporateMajorFinanceResponseDto;
 import com.tradingtrends.corporate.application.dto.CorporateMajorFinanceSearchRequestDto;
-import com.tradingtrends.corporate.domain.model.entity.CorporateMajorFinance;
+import com.tradingtrends.corporate.domain.model.CorporateMajorFinance;
 import com.tradingtrends.corporate.domain.repository.CorporateMajorFinanceRepository;
 import com.tradingtrends.corporate.domain.specification.CorporateMajorFinanceSpecification;
 import lombok.RequiredArgsConstructor;
@@ -17,8 +17,8 @@ import java.util.UUID;
 public class CorporateMajorFinanceService {
     private final CorporateMajorFinanceRepository corporateMajorFinanceRepository;
 
-    public CorporateMajorFinanceResponseDto getCorporationMajorFinance(UUID corpId) {
-        CorporateMajorFinance corporateMajorFinance = corporateMajorFinanceRepository.findById(corpId).orElseThrow(() -> new IllegalArgumentException("해당하는 기업주요재무지표가 없습니다."));
+    public CorporateMajorFinanceResponseDto getCorporationMajorFinance(UUID corporateMajorFinanceId) {
+        CorporateMajorFinance corporateMajorFinance = corporateMajorFinanceRepository.findById(corporateMajorFinanceId).orElseThrow(() -> new IllegalArgumentException("해당하는 기업주요재무지표가 없습니다."));
         CorporateMajorFinanceResponseDto corporateMajorFinanceResponseDto = new CorporateMajorFinanceResponseDto(corporateMajorFinance);
         return corporateMajorFinanceResponseDto;
     }
