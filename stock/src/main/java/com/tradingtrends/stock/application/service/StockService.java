@@ -6,6 +6,8 @@ import com.tradingtrends.stock.domain.model.Stock;
 import com.tradingtrends.stock.domain.repository.StockRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -55,6 +57,14 @@ public class StockService {
                 .orElseThrow(() -> new IllegalArgumentException(pdno + "을 찾을 수 없습니다."));
 
         return StockResponse.fromEntity(stock);
+    }
+
+    public Page<StockResponse> getAllStocksInfo(Pageable pageable) {
+        // Stock 데이터베이스에서 페이징된 결과 조회
+        Page<Stock> stockPage = stockRepository.findAll(pageable);
+
+        // Stock 엔티티 페이지를 StockResponse 페이지로 변환하여 반환
+        return stockPage.map(StockResponse::fromEntity);
     }
 
     private Stock fetchStockInfo(String pdno, String prdtTypeCd, String accessToken) {
