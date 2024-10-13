@@ -72,6 +72,7 @@ public class TokenService {
     private String generateToken(UserResponse user, Long expirationTime) {
         return Jwts.builder()
                 .claim("user_id", user.getUserId())
+                .claim("username", user.getUsername())
                 .claim("email", user.getEmail())
                 .claim("role", user.getRole())
                 .issuer(issuer)
@@ -82,7 +83,7 @@ public class TokenService {
     }
 
     // 토큰 파싱
-    private Jws<Claims> parseToken(final String token) {
+    public Jws<Claims> parseToken(final String token) {
         try {
             return Jwts.parser()
                     .verifyWith(secretKey)

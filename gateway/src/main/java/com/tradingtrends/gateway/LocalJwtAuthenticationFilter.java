@@ -2,10 +2,6 @@ package com.tradingtrends.gateway;
 
 import com.tradingtrends.gateway.application.AuthService;
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jws;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.io.Decoders;
-import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
@@ -15,18 +11,13 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
-import javax.crypto.SecretKey;
-
 @Component
 public class LocalJwtAuthenticationFilter implements GlobalFilter {
-
-    private final String secretKey;
 
     private final AuthService authService;
 
     // FeignClient 와 Global Filter 의 순환참조 문제가 발생하여 Bean 초기 로딩 시 순환을 막기 위해 @Lazy 어노테이션을 추가함.
-    public LocalJwtAuthenticationFilter(@Value("${service.jwt.secret-key}") String secretKey, @Lazy AuthService authService) {
-        this.secretKey = secretKey;
+    public LocalJwtAuthenticationFilter(@Lazy AuthService authService) {
         this.authService = authService;
     }
 
@@ -41,11 +32,25 @@ public class LocalJwtAuthenticationFilter implements GlobalFilter {
         }
 
         String token = extractToken(exchange);
-        // 토큰이 존재하지 않거나, validateToken(token) 기준에 부합하지 않으면 401 에러를 응답합니다.
-        if (token == null || !validateToken(token)) {
+        // 토큰이 존재하지 않으면 401 에러를 응답합니다.
+        if (token == null) {
             exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
             return exchange.getResponse().setComplete();
         }
+
+        Claims claims = validateToken(token);
+        // JWT 검증이 실패하면 401 에러를 응답합니다.
+        if (claims == null) {
+            exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
+            return exchange.getResponse().setComplete();
+        }
+
+        // Claims 정보를 헤더에 추가합니다.
+        exchange.getRequest().mutate().header("user_id", claims.get("user_id").toString())
+                .header("username", claims.get("username").toString())
+                .header("role", claims.get("role").toString())
+                .header("email", claims.get("email").toString())
+                .build();
 
         return chain.filter(exchange);
     }
@@ -61,27 +66,11 @@ public class LocalJwtAuthenticationFilter implements GlobalFilter {
         return null;
     }
 
-
-    private boolean validateToken(String token) {
+    private Claims validateToken(String token) {
         try {
-            // String -> SecretKey 변환 작업
-            SecretKey key = Keys.hmacShaKeyFor(Decoders.BASE64URL.decode(secretKey));
-            // JWT 에 설정된 정보를 불러옵니다.
-            Jws<Claims> claimsJws = Jwts.parser()
-                    .verifyWith(key)
-                    .build().parseSignedClaims(token);
-
-            // JWT 값 중 Payload 부분에 user_id 로 설정된 값이 있는 경우
-            if (claimsJws.getPayload().get("user_id") != null) {
-                // user_id 추출 로직
-                String userId = claimsJws.getPayload().get("user_id").toString();
-                // user_id 값으로 해당 유저가 회원가입 한 유저인지 인증 서비스를 통해 확인합니다.
-                return authService.verifyUser(Long.parseLong(userId));
-            } else {
-                return false;
-            }
-        }catch (Exception e) {
-            return false;
+            return authService.verifyJwt(token);
+        } catch (Exception e) {
+            return null;
         }
     }
 }

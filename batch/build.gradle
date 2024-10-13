@@ -22,33 +22,36 @@ ext {
 }
 
 dependencies {
-
-	implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.15.0'
-
+	implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
+	// Spring Boot 스타터 의존성
 	implementation 'org.springframework.boot:spring-boot-starter-batch'
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation 'org.springframework.boot:spring-boot-starter-data-elasticsearch'
+	implementation 'org.springframework.boot:spring-boot-starter-web' // RestTemplate 사용을 위해 추가
+
+	// 데이터베이스 드라이버
 	runtimeOnly 'org.postgresql:postgresql'
+
+	// Lombok
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
-	implementation 'org.apache.httpcomponents:httpclient:4.5.13'  // DART API 요청 시 사용
-	implementation 'org.json:json:20230227'  // JSON 변환에 사용
-	implementation 'org.apache.commons:commons-compress:1.21'  // ZIP 파일 압축 해제에 사용
+
+	// Elasticsearch Java 클라이언트
+	implementation 'co.elastic.clients:elasticsearch-java:8.15.2'
+
+	// Apache HTTP 클라이언트 (Elasticsearch 클라이언트가 의존)
+	implementation 'org.apache.httpcomponents.client5:httpclient5:5.2'
+
+	// Jackson을 통한 XML 처리
+	implementation 'com.fasterxml.jackson.core:jackson-databind:2.15.2'
+	implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.15.2'
+
+	// Apache Commons Compress (ZIP 파일 처리)
+	implementation 'org.apache.commons:commons-compress:1.26.0'
+
+	// 테스트 의존성
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.batch:spring-batch-test'
-
-	implementation 'org.springframework.boot:spring-boot-starter-data-elasticsearch'
-	// Elasticsearch Rest High Level Client 7.x
-//	implementation 'org.elasticsearch.client:elasticsearch-rest-high-level-client:7.17.9'
-//
-//	// Elasticsearch Java 클라이언트
-//	implementation 'co.elastic.clients:elasticsearch-java:8.10.0'
-//
-//	// Apache HTTP 클라이언트 (Elasticsearch 클라이언트가 의존)
-//	implementation 'org.apache.httpcomponents.client5:httpclient5:5.1'
-//
-	// JSON 처리를 위한 Jackson
-	implementation 'com.fasterxml.jackson.core:jackson-databind:2.15.0'
-
-
 }
 
 dependencyManagement {
@@ -56,7 +59,6 @@ dependencyManagement {
 		mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
 	}
 }
-
 
 tasks.named('test') {
 	useJUnitPlatform()

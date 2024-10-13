@@ -4,6 +4,7 @@ import com.tradingtrends.auth.application.service.AuthService;
 import com.tradingtrends.auth.application.service.TokenService;
 import com.tradingtrends.auth.infrastructure.client.UserResponse;
 import com.tradingtrends.auth.presentation.request.LoginRequestDto;
+import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Value;
@@ -60,11 +61,10 @@ public class AuthController {
         return ResponseEntity.noContent().build();
     }
 
-    // userId 존재 여부 검증 API
+    // Jwt 검증 API
     @GetMapping("/verify")
-    public ResponseEntity<Boolean> verifyUser(@RequestParam("user_id") Long userId) {
-        Boolean isValidUser = authService.verifyUser(userId);
-        return ResponseEntity.ok(isValidUser);
+    public ResponseEntity<Claims> verifyJwt(@RequestParam("token") String token) {
+        return ResponseEntity.ok(authService.verifyJwt(token));
     }
 
     // Access Token 재발행 API

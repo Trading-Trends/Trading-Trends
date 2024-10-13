@@ -6,57 +6,254 @@ services:
     restart: always
     volumes:
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./postgres_data:/var/lib/postgresql/data
     ports:
       - "25432:5432"
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: tradingtrends
-  redis:
+
+  redis-master:
+    image: 'bitnami/redis:latest'
+    container_name: redis-master
+    user: root
+    command: redis-server --appendonly yes --protected-mode no
+    environment:
+      - REDIS_REPLICATION_MODE=master
+      - ALLOW_EMPTY_PASSWORD=yes
+    ports:
+      - "6379:6379"
+    networks:
+      - redis_network
+    volumes:
+      - ./redis_data/master:/data
+
+  redis-slave1:
+    image: 'bitnami/redis:latest'
+    container_name: redis-slave1
+    user: root
+    command: redis-server --replicaof redis-master 6379 --appendonly yes --protected-mode no
+    environment:
+      - REDIS_MASTER_HOST=redis-master
+      - REDIS_REPLICATION_MODE=slave
+      - ALLOW_EMPTY_PASSWORD=yes
+    ports:
+      - "6380:6379"
+    depends_on:
+      - redis-master
+    networks:
+      - redis_network
+    volumes:
+      - ./redis_data/slave1:/data
+
+  redis-slave2:
+    image: 'bitnami/redis:latest'
+    container_name: redis-slave2
+    user: root
+    command: redis-server --replicaof redis-master 6379 --appendonly yes --protected-mode no
+    environment:
+      - REDIS_MASTER_HOST=redis-master
+      - REDIS_REPLICATION_MODE=slave
+      - ALLOW_EMPTY_PASSWORD=yes
+    ports:
+      - "6381:6379"
+    depends_on:
+      - redis-master
+    networks:
+      - redis_network
+    volumes:
+      - ./redis_data/slave2:/data
+
+  redis-sentinel1:
+    image: 'bitnami/redis-sentinel:latest'
+    container_name: redis-sentinel1
+    user: root
+    volumes:
+      - ./redis_sentinel:/etc/redis
+    command: redis-sentinel /etc/redis/sentinel1.conf
+    ports:
+      - "26379:26379"
+    depends_on:
+      - redis-master
+      - redis-slave1
+      - redis-slave2
+    networks:
+      - redis_network
+
+  redis-sentinel2:
+    image: 'bitnami/redis-sentinel:latest'
+    container_name: redis-sentinel2
+    user: root
+    volumes:
+      - ./redis_sentinel:/etc/redis
+    command: redis-sentinel /etc/redis/sentinel2.conf
+    ports:
+      - "26380:26379"
+    depends_on:
+      - redis-master
+      - redis-slave1
+      - redis-slave2
+    networks:
+      - redis_network
+
+  redis-sentinel3:
+    image: 'bitnami/redis-sentinel:latest'
+    container_name: redis-sentinel3
+    user: root
+    volumes:
+      - ./redis_sentinel:/etc/redis
+    command: redis-sentinel /etc/redis/sentinel3.conf
+
+    ports:
+      - "26381:26379"
+    depends_on:
+      - redis-master
+      - redis-slave1
+      - redis-slave2
+    networks:
+      - redis_network
+
+  redis-auth:
     image: 'redis:latest'  # Redis 이미지 사용
     hostname: redis
     command: redis-server --requirepass systempass --port 6379
-    networks:
-      - postgres_network  # 동일 네트워크 사용
     ports:
-      - "26379:6379"  # 바인딩할 포트:내부 포트
+      - "26479:6379"  # 바인딩할 포트:내부 포트
 
-  zookeeper:
+  coin-zookeeper:
     image: confluentinc/cp-zookeeper:latest
-    container_name: tt-zookeeper
+    container_name: coin-zookeeper
     ports:
       - "2181:2181"
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_SERVER_ID: 1
 
-  kafka:
+  stock-zookeeper:
+    image: confluentinc/cp-zookeeper:latest
+    container_name: stock-zookeeper
+    ports:
+      - "2182:2181"  # 주식 서비스용 주키퍼는 포트를 2182로 사용
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_SERVER_ID: 2
+
+  coin-kafka1:
     image: confluentinc/cp-kafka:latest
-    container_name: tt-kafka
+    container_name: coin-kafka1
     ports:
       - "9092:9092"
       - "29092:29092"
     environment:
-      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka:19092,EXTERNAL://${DOCKER_HOST_IP:-127.0.0.1}:9092,DOCKER://host.docker.internal:29092
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT,DOCKER:PLAINTEXT
-      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
-      KAFKA_ZOOKEEPER_CONNECT: "zookeeper:2181"
       KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: "coin-zookeeper:2181"
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://coin-kafka1:19092,EXTERNAL://${DOCKER_HOST_IP:-127.0.0.1}:9092,DOCKER://host.docker.internal:29092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT,DOCKER:PLAINTEXT
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
     depends_on:
-      - zookeeper
+      - coin-zookeeper
+
+  coin-kafka2:
+    image: confluentinc/cp-kafka:latest
+    container_name: coin-kafka2
+    ports:
+      - "9093:9093"
+      - "29093:29093"
+    environment:
+      KAFKA_BROKER_ID: 2
+      KAFKA_ZOOKEEPER_CONNECT: "coin-zookeeper:2181"
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://coin-kafka2:19093,EXTERNAL://${DOCKER_HOST_IP:-127.0.0.1}:9093,DOCKER://host.docker.internal:29093
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT,DOCKER:PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+    depends_on:
+      - coin-zookeeper
+
+  coin-kafka3:
+    image: confluentinc/cp-kafka:latest
+    container_name: coin-kafka3
+    ports:
+      - "9094:9094"
+      - "29094:29094"
+    environment:
+      KAFKA_BROKER_ID: 3
+      KAFKA_ZOOKEEPER_CONNECT: "coin-zookeeper:2181"
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://coin-kafka3:19094,EXTERNAL://${DOCKER_HOST_IP:-127.0.0.1}:9094,DOCKER://host.docker.internal:29094
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT,DOCKER:PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+    depends_on:
+      - coin-zookeeper
+
+  stock-kafka1:
+    image: confluentinc/cp-kafka:latest
+    container_name: stock-kafka1
+    ports:
+      - "9095:9095"
+      - "29095:29095"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: "stock-zookeeper:2181"
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://stock-kafka1:19095,EXTERNAL://${DOCKER_HOST_IP:-127.0.0.1}:9095,DOCKER://host.docker.internal:29095
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT,DOCKER:PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+    depends_on:
+      - stock-zookeeper
+
+  stock-kafka2:
+    image: confluentinc/cp-kafka:latest
+    container_name: stock-kafka2
+    ports:
+      - "9096:9096"
+      - "29096:29096"
+    environment:
+      KAFKA_BROKER_ID: 2
+      KAFKA_ZOOKEEPER_CONNECT: "stock-zookeeper:2181"
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://stock-kafka2:19096,EXTERNAL://${DOCKER_HOST_IP:-127.0.0.1}:9096,DOCKER://host.docker.internal:29096
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT,DOCKER:PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+    depends_on:
+      - stock-zookeeper
+
+  stock-kafka3:
+    image: confluentinc/cp-kafka:latest
+    container_name: stock-kafka3
+    ports:
+      - "9097:9097"
+      - "29097:29097"
+    environment:
+      KAFKA_BROKER_ID: 3
+      KAFKA_ZOOKEEPER_CONNECT: "stock-zookeeper:2181"
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://stock-kafka3:19097,EXTERNAL://${DOCKER_HOST_IP:-127.0.0.1}:9097,DOCKER://host.docker.internal:29097
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT,DOCKER:PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+    depends_on:
+      - stock-zookeeper
 
   kafka-ui:
     image: provectuslabs/kafka-ui:latest
     container_name: tt-kafka-ui
     depends_on:
-      - kafka
+      - coin-kafka1
+      - coin-kafka2
+      - coin-kafka3
+      - stock-kafka1
+      - stock-kafka2
+      - stock-kafka3
     ports:
       - "8080:8080"
     environment:
-      KAFKA_CLUSTERS_0_NAME: local
-      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:29092
-      KAFKA_CLUSTERS_0_ZOOKEEPER: zookeeper:2181
+      KAFKA_CLUSTERS_0_NAME: coin
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: coin-kafka1:29092,coin-kafka2:29093,coin-kafka3:29094
+      KAFKA_CLUSTERS_1_NAME: stock
+      KAFKA_CLUSTERS_1_BOOTSTRAPSERVERS: stock-kafka1:29095,stock-kafka2:29096,stock-kafka3:29097
+      KAFKA_CLUSTERS_0_ZOOKEEPER: coin-zookeeper:2181
+      KAFKA_CLUSTERS_1_ZOOKEEPER: stock-zookeeper:2181
 
   zipkin:
     image: openzipkin/zipkin:latest
@@ -65,5 +262,17 @@ services:
       - "9411:9411"
 
 networks:
-  postgres_network:
+  redis_network:
     driver: bridge
+#    ipam:
+#      config:
+#        - subnet: 172.22.0.0/16 # master, slave, sentinel**이 모두 같은 네트워크로 묶여있다면, 굳이 정적 IP 주소를 할당하지 않아도 됩니다
+
+#  redis:
+#    image: 'redis:latest'  # Redis 이미지 사용
+#    hostname: redis
+#    command: redis-server --requirepass systempass --port 6379
+#    networks:
+#      - postgres_network  # 동일 네트워크 사용
+#    ports:
+#      - "26379:6379"  # 바인딩할 포트:내부 포트

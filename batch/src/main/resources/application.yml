@@ -1,4 +1,10 @@
+server:
+  port: 19098
+
 spring:
+  application:
+    name: batch
+
   datasource:
     url: jdbc:postgresql://localhost:25432/tradingtrends
     username: btc
