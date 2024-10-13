@@ -37,8 +37,15 @@ public class DisclosureContorller {
     }
 
     @GetMapping("/{corporate_report_id}")
-    public ResponseEntity<DisclosureResponseDto> searchCorporateReport(@PathVariable("corporate_report_id") String corporateReportId) {
+    public ResponseEntity<DisclosureResponseDto> searchCorporateReport(
+            @PathVariable("corporate_report_id") String corporateReportId
+//            @RequestHeader("user_id") String userId,
+//            @RequestHeader("username") String username,
+//            @RequestHeader("role") String role,
+//            @RequestHeader("email") String email
+            ) {
         try {
+//            log.info("Received request with headers - user_id: {}, username: {}, role: {}, email: {}", userId, username, role, email);
             DisclosureResponseDto result = searchService.getDisclosureById(corporateReportId);
             if (result != null) {
                 return ResponseEntity.ok(result);

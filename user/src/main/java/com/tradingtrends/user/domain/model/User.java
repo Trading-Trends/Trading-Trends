@@ -44,6 +44,24 @@ public class User {
                 .build();
     }
 
+    public void changePassword(String newPassword) {
+        if (newPassword == null || newPassword.length() < 8) {
+            throw new IllegalArgumentException("비밀번호는 8자 이상이어야 합니다.");
+        }
+        this.password = newPassword;
+    }
+
+    public void changeEmail(String newEmail) {
+        if (!newEmail.contains("@")) {
+            throw new IllegalArgumentException("유효한 이메일 주소가 아닙니다.");
+        }
+        this.email = newEmail;
+    }
+
+    public void changeRole(Role newRole) {
+        this.role = newRole;
+    }
+
     // Role enum
     public enum Role {
         USER,

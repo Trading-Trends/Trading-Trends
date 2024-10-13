@@ -29,7 +29,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 @Configuration
 @RequiredArgsConstructor
 @Slf4j
-public class DartCorporateApiBatchConfig extends DefaultBatchConfiguration {
+public class DartCorporateApiBatchConfig {
 
     /*
         Chunk-Oriented Processing은 대용량 데이터를 단계별로 처리할 때 유리하며, 대규모 배치 작업에 적합합니다.

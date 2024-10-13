@@ -2,7 +2,7 @@ package com.tradingtrends.auth.presentation.controller;
 
 import com.tradingtrends.auth.application.service.AuthService;
 import com.tradingtrends.auth.application.service.TokenService;
-import com.tradingtrends.auth.infrastructure.client.UserResponse;
+import com.tradingtrends.auth.infrastructure.client.UserDetailsDto;
 import com.tradingtrends.auth.presentation.request.LoginRequestDto;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.Cookie;
@@ -12,10 +12,12 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 @RestController
-@RequestMapping("/auth")
+@RequestMapping("/api/auth")
 public class AuthController {
 
     private final AuthService authService;
@@ -36,9 +38,9 @@ public class AuthController {
         authService.authenticateUser(loginRequestDto.getUsername(), loginRequestDto.getPassword());
 
         // 사용자 정보로 토큰 생성
-        UserResponse userResponse = authService.retrieveUserByUsername(loginRequestDto.getUsername());
-        String accessToken = tokenService.createAccessToken(userResponse);
-        String refreshToken = tokenService.createRefreshToken(userResponse);
+        UserDetailsDto userDetailsDto = authService.retrieveUserByUsername(loginRequestDto.getUsername());
+        String accessToken = tokenService.createAccessToken(userDetailsDto);
+        String refreshToken = tokenService.createRefreshToken(userDetailsDto);
 
         // refreshToken을 쿠키에 저장
         addCookieToResponse(response, "refreshToken", refreshToken, refreshExpiration);
@@ -63,8 +65,8 @@ public class AuthController {
 
     // Jwt 검증 API
     @GetMapping("/verify")
-    public ResponseEntity<Claims> verifyJwt(@RequestParam("token") String token) {
-        return ResponseEntity.ok(authService.verifyJwt(token));
+    public ResponseEntity<Map<String, Object>> verifyJwt(@RequestParam("token") String token) {
+        return ResponseEntity.ok(new HashMap<>(authService.verifyJwt(token)));
     }
 
     // Access Token 재발행 API

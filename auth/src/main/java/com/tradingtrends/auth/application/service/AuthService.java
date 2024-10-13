@@ -1,7 +1,7 @@
 package com.tradingtrends.auth.application.service;
 
 import com.tradingtrends.auth.infrastructure.client.UserClient;
-import com.tradingtrends.auth.infrastructure.client.UserResponse;
+import com.tradingtrends.auth.infrastructure.client.UserDetailsDto;
 import feign.FeignException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -29,13 +29,13 @@ public class AuthService {
 
     // 로그인 시 사용자 정보 검증
     public void authenticateUser(String username, String rawPassword) {
-        UserResponse user = retrieveUserByUsername(username);
+        UserDetailsDto user = retrieveUserByUsername(username);
         validatePassword(rawPassword, user.getPassword());
     }
 
-    public UserResponse retrieveUserByUsername(final String username) throws RuntimeException {
+    public UserDetailsDto retrieveUserByUsername(final String username) throws RuntimeException {
         try {
-            return userClient.getUserByUsername(username);
+            return userClient.getUserDetailsByUsername(username);
         } catch (FeignException.NotFound e) {
             throw new RuntimeException("유저가 존재하지 않습니다.");
         } catch (FeignException e) {

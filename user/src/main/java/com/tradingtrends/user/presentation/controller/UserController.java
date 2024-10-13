@@ -3,13 +3,12 @@ package com.tradingtrends.user.presentation.controller;
 
 import com.tradingtrends.user.application.dto.UserResponseDto;
 import com.tradingtrends.user.application.service.UserService;
-import com.tradingtrends.user.domain.model.User;
-import com.tradingtrends.user.presentation.request.UserRequest;
+import com.tradingtrends.user.presentation.request.UserRequestDto;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/member")
+@RequestMapping("/api/member")
 public class UserController {
 
     private final UserService userService;
@@ -20,27 +19,32 @@ public class UserController {
 
     // 회원가입 API
     @PostMapping
-    public ResponseEntity<UserResponseDto> registerUser(@RequestBody UserRequest userRequest) {
-        User user = userService.registerUser(userRequest);
-        return ResponseEntity.ok(new UserResponseDto(user.getUserId(), user.getUsername(), user.getPassword(),user.getEmail(), user.getRole().toString()));
+    public ResponseEntity<String> registerUser(@RequestBody UserRequestDto userRequestDto) {
+        userService.registerUser(userRequestDto);
+        return ResponseEntity.ok("회원가입 성공");
     }
 
-    // userId로 user 검증
-    @GetMapping("/verify")
-    public ResponseEntity<Boolean> verifyUser(@RequestParam("user_id") Long userId) {
-        return ResponseEntity.ok(userService.verifyUser(userId));
+    // 사용자 정보 수정 API
+    @PatchMapping("/{user_id}")
+    public ResponseEntity<UserResponseDto> updateUser(@PathVariable("user_id") Long userId, @RequestBody UserRequestDto userRequestDto) {
+        UserResponseDto updatedUser = userService.updateUser(userId, userRequestDto);
+        return ResponseEntity.ok(updatedUser);
     }
 
-    // userId로 user 조회 및 응답
-    @GetMapping("/id/{user_id}")
-    public ResponseEntity<UserResponseDto> getUserById(@PathVariable("user_id") Long userId) {
+    // 사용자 삭제 API
+    @DeleteMapping("/{user_id}")
+    public ResponseEntity<String> deleteUser(@PathVariable("user_id") Long userId, @RequestParam String password) {
+        boolean isDeleted = userService.deleteUser(userId, password);
+        if (isDeleted) {
+            return ResponseEntity.ok("사용자 삭제 성공");
+        } else {
+            return ResponseEntity.status(400).body("비밀번호가 일치하지 않거나 사용자가 존재하지 않습니다.");
+        }
+    }
+
+    @GetMapping("/{user_id}")
+    public ResponseEntity<UserResponseDto> getUser(@PathVariable("user_id") Long userId) {
         return ResponseEntity.ok(userService.getUserById(userId));
-    }
-
-    // username으로 조회
-    @GetMapping("/{username}")
-    public ResponseEntity<UserResponseDto> getUserByUsername(@PathVariable("username") String username) {
-        return ResponseEntity.ok(userService.getUserByUsername(username));
     }
 
 }
