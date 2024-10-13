@@ -1,6 +1,7 @@
 package com.tradingtrends.stock.application.service;
 
 import com.tradingtrends.stock.application.dto.StockRequest;
+import com.tradingtrends.stock.application.dto.StockResponse;
 import com.tradingtrends.stock.domain.model.Stock;
 import com.tradingtrends.stock.domain.repository.StockRepository;
 import lombok.RequiredArgsConstructor;
@@ -47,6 +48,13 @@ public class StockService {
 
             Thread.sleep(1000); // 1초 대기
         }
+    }
+
+    public StockResponse getStockInfo(String pdno) {
+        Stock stock = stockRepository.findById(pdno)
+                .orElseThrow(() -> new IllegalArgumentException(pdno + "을 찾을 수 없습니다."));
+
+        return StockResponse.fromEntity(stock);
     }
 
     private Stock fetchStockInfo(String pdno, String prdtTypeCd, String accessToken) {
