@@ -1,4 +1,4 @@
-# Jwt 인증 시나리오 
+# Jwt 인증 시나리오 참고 사항
 
 
 ## Step1	사용자 로그인
@@ -21,8 +21,6 @@ HTTP/1.1 200
 Authorization: Bearer {Access Token}
 Date: Mon, 14 Oct 2024 06:40:01 GMT
 Content-Length: 0
-
-
 
 ## Step3	로그아웃
 ### (POST http://localhost:19091/api/auth/logout)

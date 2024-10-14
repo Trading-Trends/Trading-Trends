@@ -3,8 +3,8 @@ POST http://localhost:19091/api/auth/login
 Content-Type: application/json
 
 {
-  "username": "kmc",
-  "password": "12"
+  "username": "user",
+  "password": "123"
 }
 ###
 

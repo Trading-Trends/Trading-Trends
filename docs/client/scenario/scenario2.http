@@ -13,9 +13,15 @@ GET http://localhost:19094/api/corporate/top-corp-codes?size=3
 Accept: application/json
 
 ### 기업 공시 자료 조회 및 검색
-GET http://localhost:19094n/api/corporate-report?corp_name=&reportNm=&start_date=20240101&end_date=20240201
+GET http://localhost:19094/api/corporate-report?corpName=&reportNm=&startDate=20240201&endDate=20240201
 Accept: application/json
+### Query Parameters
+#corpName=회사 이름
+#reportNm=보고서 명
+#startDate=20240101 (조회 시작일)
+#endDate=20240201 (조회 종료일)
 
 ### 기업 공시 자료 상세 조회
 GET http://localhost:19094/api/corporate-report/{corporate_report_id}
 Accept: application/json
+# 기업 공시 자료 조회 및 검색에서 나온 rceptNo를 id 값으로 상세 조회

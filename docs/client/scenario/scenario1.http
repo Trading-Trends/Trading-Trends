@@ -1,4 +1,11 @@
 ### 마스터 권한으로 로그인
+POST http://localhost:19091/api/auth/login
+Content-Type: application/json
+
+{
+  "username": "admin",
+  "password": "123"
+}
 
 ### 기업 고유번호 수집
 GET http://your-api-domain/api/data-collection/corporate-major-finance/corp-code
