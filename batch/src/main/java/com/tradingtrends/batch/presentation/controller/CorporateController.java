@@ -14,18 +14,18 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/corporate-finance")
+@RequestMapping("/api/data-collection/corporate-major-finance")
 public class CorporateController {
 
     private final CorporateService corporateService;
 
-    @GetMapping("/fetch-corp-code-info")
+    @GetMapping("/corp-code")
     public ResponseEntity<List<CorporateCodesResponseDto>> fetchCorpCodeInfo()
         throws Exception {
         return ResponseEntity.status(HttpStatus.OK).body(corporateService.fetchAndSaveCorpCodeInfo());
     }
 
-    @GetMapping("/fetch-corp-finance-info")
+    @GetMapping
     public ResponseEntity<List<DartCorporateFinanceApiResponse.CorporateFinanceDto>> fetchCorpCodeFinanceInfo()
         throws Exception {
         return  ResponseEntity.status(HttpStatus.OK).body(corporateService.fetchAndSaveCorpFinanceInfo());
