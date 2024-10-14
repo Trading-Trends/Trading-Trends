@@ -9,6 +9,22 @@
 
 # scenario-2.http 테스트 시 필요한 준비사항
 
+1. docker-compose -f docker-compose-elk.yml up -d
+
+2. scenario-2 실행
+   - 2-1. 사용자 권한 계정 생성
+   - 2-2. 사용자 로그인 (accessToken 복사)
+   - 2-3. 기업 재무 정보 조회 (accessToken 붙여넣기)
+   - 2-4. 기업 재무 정보 상세 조회 (accessToken 붙여넣기)
+   - 2-5. 핫토픽 Top N 기업 조회 (accessToken 붙여넣기)
+   - 2-6. 기업 공시 자료 조회 및 검색 (accessToken 붙여넣기)
+   - 2-7. 기업 공시 자료 상세 조회 (accessToken 붙여넣기)
+
+3. 테스트 결과 및 주의사항
+   - docker-compose-kafka가 실행되어 있으면 종료하시고 docker-compose-elk를 실행해주세요.
+4. 실행해야 하는 모듈
+   - eureka, gateway, auth, user, batch, corporate
+
 # scenario-3-1.http 테스트시 필요한 준비사항 
 
 1. docker-compose -f docker-compose-kafka.yml up -d 
@@ -50,3 +66,21 @@
 2. scenario-3-2는 한국투자증권 api 를 발급 받아야 진행 가능합니다(app-key, secret-key). 한국투자증권 계좌가 있으신분만 진행해주세요
    - url : https://securities.koreainvestment.com/main/customer/systemdown/RestAPIService.jsp
    - image : ![img.png](images/img-한투.png)
+
+
+# scenario-4.http 테스트시 필요한 준비사항
+1. docker-compose -f docker-compose-elk.yml up -d
+
+2. scenario-4 실행 
+   - 4-1. 사용자 로그인
+   - 4-2. Access Token 재발급 성공
+   - 4-3. 로그아웃
+   - 4-4. Access Token 재발급 실패
+
+3. 테스트 결과 및 주의사항
+   - 쿠키에 저장된 refreshToken이 삭제되거나, 블랙리스트에 포함된 경우, 재발급이 불가능합니다.
+   
+4. 실행해야 하는 모듈
+   - eureka, gateway, auth, user
+
+eureka, gateway, auth
