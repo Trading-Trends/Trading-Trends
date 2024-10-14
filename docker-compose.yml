@@ -114,13 +114,6 @@ services:
     networks:
       - redis_network
 
-  redis-auth:
-    image: 'redis:latest'  # Redis 이미지 사용
-    hostname: redis
-    command: redis-server --requirepass systempass --port 6379
-    ports:
-      - "26479:6379"  # 바인딩할 포트:내부 포트
-
   coin-zookeeper:
     image: confluentinc/cp-zookeeper:latest
     container_name: coin-zookeeper
