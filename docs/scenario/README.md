@@ -1,29 +1,33 @@
 
 # scenario-1.http 테스트 시 필요한 준비사항
 
-1. docker-compose -f docker-compose-elk.yml up -d
+1. docker-compose-kafka.yml이 docker-compose up 되어 있다면, 터미널에 다음 명령어 실행
 
-2. scenario-1 실행 
-   - 1-1. 마스터 로그인 특이사항 작성해주세요.
-   - 1-3. 공시 검색 정보 수집 및 공시 원본 수집 시 bgn_de, end_de 에 각각 수집을 원하는 시작일, 종료일을 입력하시면 됩니다.
+   > docker-compose -f docker-compose-kafka.yml down
+2. docker-compose-elk.yml 실행
+   > docker-compose -f docker-compose-elk.yml up -d
+3. 실행해야 하는 모듈
+   - eureka, gateway, auth, user, batch
+4. Scenario-1 실행 
+5. 시나리오 실행 시 주의 사항
+   - 1-1. 마스터 권한 
+   - **1-5. 공시 검색 정보 수집 및 공시 원본 수집** 시 bgn_de, end_de 에 각각 수집을 원하는 시작일, 종료일을 입력하시면 됩니다.
 
 # scenario-2.http 테스트 시 필요한 준비사항
 
-1. docker-compose -f docker-compose-elk.yml up -d
+1. docker-compose-kafka.yml이 docker-compose up 되어 있다면, 터미널에 다음 명령어 실행
 
-2. scenario-2 실행
-   - 2-1. 사용자 권한 계정 생성
-   - 2-2. 사용자 로그인 (accessToken 복사)
-   - 2-3. 기업 재무 정보 조회 (accessToken 붙여넣기)
-   - 2-4. 기업 재무 정보 상세 조회 (accessToken 붙여넣기)
-   - 2-5. 핫토픽 Top N 기업 조회 (accessToken 붙여넣기)
-   - 2-6. 기업 공시 자료 조회 및 검색 (accessToken 붙여넣기)
-   - 2-7. 기업 공시 자료 상세 조회 (accessToken 붙여넣기)
+   > docker-compose -f docker-compose-kafka.yml down
+2. docker-compose-elk.yml 실행
+   > docker-compose -f docker-compose-elk.yml up -d 
+3. 실행해야 하는 모듈
+   - eureka, gateway, auth, user, corporate 
+4. Scenario-2 실행 
+5. 시나리오 실행 시 주의 사항
+   - **2-2 사용자 로그인** 후 accessToken 복사하여 scenario-2의 모든 api 호출 시 붙여넣어 사용합니다.
+   - **2-4 기업 주요 재무 지표 상세 조회** 시 {corporate_finance_id} 부분 실제 값으로 변경해주세요.
+   - **2-7. 기업 공시 자료 상세 조회** 시 {corporate_report_id} 부분 실제 값으로 변경해서 요청해주세요.
 
-3. 테스트 결과 및 주의사항
-   - docker-compose-kafka가 실행되어 있으면 종료하시고 docker-compose-elk를 실행해주세요.
-4. 실행해야 하는 모듈
-   - eureka, gateway, auth, user, batch, corporate
 
 # scenario-3-1.http 테스트시 필요한 준비사항 
 
