@@ -3,7 +3,6 @@ package com.tradingtrends.corporate.presentation.controller;
 
 import com.tradingtrends.corporate.application.dto.DisclosureResponseDto;
 import com.tradingtrends.corporate.application.service.DisclosureSearchService;
-import com.tradingtrends.corporate.domain.model.entity.DisclosureDocument;
 import com.tradingtrends.corporate.presentation.request.DisclosureSearchRequestDto;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +17,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/corporate-report")
 @RequiredArgsConstructor
-public class DisclosureContorller {
+public class DisclosureController {
 
     private final DisclosureSearchService searchService;
 
