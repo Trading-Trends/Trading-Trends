@@ -10,9 +10,10 @@ Content-Type: application/json
   "email": "yourEmail@example.com",
   "role": "master"
 }
+
 ###
 
-# @name Step 0 : 유저 로그인
+# @name Step 0 : 유저 로그인 - 응답 헤더의 Authorization 값 아래 Step 1 ~ 4번에 넣어주셔야 합니다. (Bearer ...)
 POST http://localhost:19091/api/auth/login
 Content-Type: application/json
 
@@ -24,24 +25,34 @@ Content-Type: application/json
 
 ###
 
-# @name Step 1 : 유저 ID 별 수신 웹소켓 연결 - Postman WebScoket Template 이용
-url : ws://localhost:19100/ws/connect/coin-data-per-user?userId=1
+# @name Step 1 : 유저 ID 별 수신 웹소켓 연결 - Postman WebScoket Template 이용, README 참고
+url : ws://localhost:19091/ws/connect/coin-data-per-user?userId=1
 
 ###
 
 # @name Step 2 : 유저가 원하는 종목 Redis 채널 발행
 # 비트코인 실시간 데이터
-POST http://localhost:19091/api/subscription/subscribe/1/KRW-BTC
+POST http://localhost:19091/api/subscription/subscribe
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJ1c2VyX2lkIjoxLCJ1c2VybmFtZSI6ImluaGVlIiwiZW1haWwiOiJ5b3VyRW1haWxAZXhhbXBsZS5jb20iLCJyb2xlIjoiVVNFUiIsImlzcyI6ImF1dGgiLCJpYXQiOjE3Mjg5MTI0MjMsImV4cCI6MTcyODk0ODQyM30.Sd-0_JTVbdctJRAGzz5j4l_h9ehY7k5F5Qn08_IpW01BkpP0UrW3ituW2W1WtCkcetKwRpDk3NLHG18S2k3GpA
+
+{
+  "userId": 1,
+  "marketCode": "KRW-BTC"
+}
+
+
 
 ###
 
 # @name Step 3 : Upbit WebSocket 연결 API
 POST http://localhost:19091/api/coin/connect-websocket
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJ1c2VyX2lkIjoxLCJ1c2VybmFtZSI6ImluaGVlIiwiZW1haWwiOiJ5b3VyRW1haWxAZXhhbXBsZS5jb20iLCJyb2xlIjoiVVNFUiIsImlzcyI6ImF1dGgiLCJpYXQiOjE3Mjg5MTI0MjMsImV4cCI6MTcyODk0ODQyM30.Sd-0_JTVbdctJRAGzz5j4l_h9ehY7k5F5Qn08_IpW01BkpP0UrW3ituW2W1WtCkcetKwRpDk3NLHG18S2k3GpA###
 
 ###
 
-# @name STep 4 : Upbit WebSocket 해제 API
+# @name STeP 4 : Upbit WebSocket 해제 API
 POST http://localhost:19091/api/coin/disconnect-websocket
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJ1c2VyX2lkIjoxLCJ1c2VybmFtZSI6ImluaGVlIiwiZW1haWwiOiJ5b3VyRW1haWxAZXhhbXBsZS5jb20iLCJyb2xlIjoiVVNFUiIsImlzcyI6ImF1dGgiLCJpYXQiOjE3Mjg5MTI0MjMsImV4cCI6MTcyODk0ODQyM30.Sd-0_JTVbdctJRAGzz5j4l_h9ehY7k5F5Qn08_IpW01BkpP0UrW3ituW2W1WtCkcetKwRpDk3NLHG18S2k3GpA

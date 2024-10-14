@@ -39,13 +39,14 @@ public class ClientSubscriptionService {
      * - coin : KRW-*
      * - stock : ex) 000000
      */
-    public void subscribeUserToMarket(String userId, String marketCode) {
+    public void subscribeUserToMarket(Long userId, String marketCode) {
         // 유저가 이미 구독 중인지 확인
         Boolean isAlreadySubscribed = redisTemplate.hasKey("market:" + marketCode + ":subscribers");
 
+
         // Redis에서 종목별로 구독한 유저 관리 (유저 ID를 종목 코드에 추가)
-        redisTemplate.opsForSet().add("market:" + marketCode + ":subscribers", userId);
-        log.info("User {} subscribed to market {}", userId, marketCode);
+        redisTemplate.opsForSet().add("market:" + marketCode + ":subscribers", String.valueOf(userId));
+        log.info("User {} subscribed to market {}", String.valueOf(userId), marketCode);
 
         // 채널(해당 종목)이 아직 구독되지 않았을 경우에만 Redis Pub/Sub 채널 구독을 추가
         if (!Boolean.TRUE.equals(isAlreadySubscribed)) {

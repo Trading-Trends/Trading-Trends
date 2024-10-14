@@ -1,12 +1,14 @@
 package com.tradingtrends.market.presentation.controller;
 
 import com.tradingtrends.market.application.service.ClientSubscriptionService;
+import com.tradingtrends.market.presentation.request.SubscribeRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -17,16 +19,16 @@ import org.springframework.web.bind.annotation.RestController;
 public class ClientSubscriptionController {
 
     private final ClientSubscriptionService clientSubscriptionService;
+
     /**
      * 유저가 특정 종목을 구독하는 API
-     * @param userId 유저 ID
-     * @param marketCode 종목 코드
-     * @return ResponseEntity<String>
+     * @param request
+     * @return
      */
-    @PostMapping("/subscribe/{userId}/{marketCode}")
-    public ResponseEntity<String> subscribeToMarket(@PathVariable String userId, @PathVariable String marketCode) {
-        clientSubscriptionService.subscribeUserToMarket(userId, marketCode);
-        return ResponseEntity.ok("User " + userId + " subscribed to market: " + marketCode);
+    @PostMapping("/subscribe")
+    public ResponseEntity<String> subscribeToMarket(@RequestBody SubscribeRequest request) {
+        clientSubscriptionService.subscribeUserToMarket(request.getUserId(), request.getMarketCode());
+        return ResponseEntity.ok("User " + request.getUserId() + " subscribed to market: " + request.getMarketCode());
     }
 
     /**
