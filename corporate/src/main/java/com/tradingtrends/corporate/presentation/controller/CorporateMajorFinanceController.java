@@ -3,6 +3,7 @@ package com.tradingtrends.corporate.presentation.controller;
 import com.tradingtrends.corporate.application.dto.CorporateMajorFinanceResponseDto;
 import com.tradingtrends.corporate.application.dto.CorporateMajorFinanceSearchRequestDto;
 import com.tradingtrends.corporate.application.service.CorporateMajorFinanceService;
+import com.tradingtrends.corporate.application.service.CorporateMajorFinanceViewCountService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -10,6 +11,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -18,10 +20,14 @@ import java.util.UUID;
 public class CorporateMajorFinanceController {
 
     private final CorporateMajorFinanceService corporateMajorFinanceService;
+    private final CorporateMajorFinanceViewCountService corporateMajorFinanceViewCountService;
 
     @GetMapping("/{corporate_major_finance_id}")
     public CorporateMajorFinanceResponseDto getCorporationMajorFinance(@PathVariable(name = "corporate_major_finance_id") UUID corporateMajorFinanceId){
-        return corporateMajorFinanceService.getCorporationMajorFinance(corporateMajorFinanceId);
+        CorporateMajorFinanceResponseDto responseDto = corporateMajorFinanceService.getCorporationMajorFinance(corporateMajorFinanceId);
+        // corpCode로 조회수 증가
+        corporateMajorFinanceViewCountService.incrementViewCount(responseDto.getCorpCode());
+        return responseDto;
     }
 
     //검색 필드: corp_code, stock_code, bsns_year
@@ -45,6 +51,10 @@ public class CorporateMajorFinanceController {
         Pageable pageable = PageRequest.of(page - 1, size, sortOption);
         Page<CorporateMajorFinanceResponseDto> CorporateFinanceDtoPage = corporateMajorFinanceService.searchCorporationMajorFinance(searchRequestDto, pageable);
         return CorporateFinanceDtoPage;
-
+    }
+    // 상위 N개의 corp_code 조회
+    @GetMapping("/top-corp-codes")
+    public List<String> getTopCorpCodes(@RequestParam(value = "size", defaultValue = "10") int size) {
+        return corporateMajorFinanceViewCountService.getTopNCorpCodes(size);
     }
 }
