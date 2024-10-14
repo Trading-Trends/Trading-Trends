@@ -13,7 +13,7 @@ GET http://localhost:19094/api/corporate/top-corp-codes?size=3
 Accept: application/json
 
 ### 기업 공시 자료 조회 및 검색
-GET http://localhost:19094n/api/corporate-report?corp_name=&reportNm=&start_date=20240101&end_date=20240201
+GET http://localhost:19094/api/corporate-report?corp_name=&reportNm=&start_date=20240101&end_date=20240201
 Accept: application/json
 
 ### 기업 공시 자료 상세 조회
