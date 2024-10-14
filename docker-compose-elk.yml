@@ -1,5 +1,19 @@
 version: '3.8'
+
 services:
+  postgres:
+    image: postgres:15.8
+    restart: always
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./postgres_data:/var/lib/postgresql/data
+    ports:
+      - "25432:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: tradingtrends
+
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:8.15.2
     container_name: elasticsearch
@@ -52,6 +66,22 @@ services:
       - elasticsearch
     networks:
       - elk
+
+  redis-corporate:
+    image: 'redis:latest'
+    container_name: redis-corporate
+    hostname: redis-corporate
+    command: redis-server --requirepass systempass --port 6379
+    ports:
+      - "26579:6379"
+
+  redis-auth:
+    image: 'redis:latest'
+    container_name: redis-auth
+    hostname: redis-auth
+    command: redis-server --requirepass systempass --port 6379
+    ports:
+      - "26479:6379"
 
 volumes:
   es-data:

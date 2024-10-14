@@ -1,8 +1,13 @@
 
-# 1,2,4
-postgres, elk, redis(단일, auth)
+# scenario-1.http 테스트 시 필요한 준비사항
 
+1. docker-compose -f docker-compose-elk.yml up -d
 
+2. scenario-1 실행 
+   - 1-1. 마스터 로그인 특이사항 작성해주세요.
+   - 1-3. 공시 검색 정보 수집 및 공시 원본 수집 시 bgn_de, end_de 에 각각 수집을 원하는 시작일, 종료일을 입력하시면 됩니다.
+
+# scenario-2.http 테스트 시 필요한 준비사항
 
 # scenario-3-1.http 테스트시 필요한 준비사항 
 

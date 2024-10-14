@@ -1,0 +1,26 @@
+### 사용자 로그인
+POST http://localhost:19091/api/auth/login
+Content-Type: application/json
+
+{
+  "username": "user",
+  "password": "123"
+}
+###
+
+### Access Token 재발급
+POST http://localhost:19091/api/auth/refresh-access-token
+Content-Type: application/json
+
+###
+
+### 로그아웃
+POST http://localhost:19091/api/auth/logout
+Content-Type: application/json
+Authorization: Bearer {Access Token}
+
+
+### Access Token 재발급 실패
+POST http://localhost:19091/api/auth/refresh-access-token
+Content-Type: application/json
+###
