@@ -10,7 +10,7 @@
    - eureka, gateway, auth, user, batch
 4. Scenario-1 실행 
 5. 시나리오 실행 시 주의 사항
-   - 1-1. 마스터 권한 
+   - 1-1. 마스터 권한 로그인 후 accessToken을 복사하여 scenario-1의 모든 API 요청 시 붙여넣어 사용합니다.
    - **1-5. 공시 검색 정보 수집 및 공시 원본 수집** 시 bgn_de, end_de 에 각각 수집을 원하는 시작일, 종료일을 입력하시면 됩니다.
 
 # scenario-2.http 테스트 시 필요한 준비사항
@@ -24,7 +24,7 @@
    - eureka, gateway, auth, user, corporate 
 4. Scenario-2 실행 
 5. 시나리오 실행 시 주의 사항
-   - **2-2 사용자 로그인** 후 accessToken 복사하여 scenario-2의 모든 api 호출 시 붙여넣어 사용합니다.
+   - **2-2 사용자 로그인** 후 accessToken을 복사하여 scenario-2의 모든 api 호출 시 붙여넣어 사용합니다.
    - **2-4 기업 주요 재무 지표 상세 조회** 시 {corporate_finance_id} 부분 실제 값으로 변경해주세요.
    - **2-7. 기업 공시 자료 상세 조회** 시 {corporate_report_id} 부분 실제 값으로 변경해서 요청해주세요.
 
