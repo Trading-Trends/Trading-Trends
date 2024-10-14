@@ -15,7 +15,6 @@ import org.springframework.batch.core.configuration.annotation.EnableBatchProces
 import org.springframework.batch.core.configuration.support.DefaultBatchConfiguration;
 import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.batch.core.repository.support.JobRepositoryFactoryBean;
 import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemProcessor;
@@ -25,7 +24,6 @@ import org.springframework.batch.item.support.ListItemReader;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
 import org.springframework.transaction.PlatformTransactionManager;
 
 @Configuration
@@ -47,15 +45,15 @@ public class DartCorporateApiBatchConfig {
     @Bean
     public Job dartApiJob(JobRepository jobRepository, Step dartApiStep) {
         return new JobBuilder("dartApiJob", jobRepository)
-                .start(dartApiStep)
-                .build();
+            .start(dartApiStep)
+            .build();
     }
 
     @Bean
     public Step dartApiStep(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
         return new StepBuilder("dartApiStep", jobRepository)
-                .tasklet(repeatScheduleTasklet, transactionManager)
-                .build();
+            .tasklet(repeatScheduleTasklet, transactionManager)
+            .build();
     }
 
 

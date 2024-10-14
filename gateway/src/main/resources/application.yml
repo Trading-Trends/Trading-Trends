@@ -12,15 +12,15 @@ spring:
         - id: auth
           uri: lb://auth
           predicates:
-            - Path=/auth/**
+            - Path=/api/auth/**
         - id: user
           uri: lb://user-service
           predicates:
-            - Path=/member/**
+            - Path=/api/member/**
         - id: corporate
           uri: lb://corporate
           predicates:
-            - Path=/corporate/**
+            - Path=/api/corporate-report/**, /api/corporate-major-finance/**, /api/interested-corporate/**
         - id: stock
           uri: lb://stock
           predicates:
@@ -28,7 +28,7 @@ spring:
         - id: coin
           uri: lb://coin
           predicates:
-            - Path=/coin/**
+            - Path=/api/coin/**, /api/interested-coin/**, /connect-websocket, /disconnect-websocket
         - id: notification
           uri: lb://notification
           predicates:
@@ -36,11 +36,15 @@ spring:
         - id: batch
           uri: lb://batch
           predicates:
-            - Path=/batch/**
+            - Path=/api/data-collection/**
         - id: common
           uri: lb://common
           predicates:
             - Path=/common/**
+        - id: market
+          uri: lb://market
+          predicates:
+            - Path=/api/subscription
       discovery:
         locator:
           enabled: true

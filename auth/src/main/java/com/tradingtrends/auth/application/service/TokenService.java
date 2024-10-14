@@ -1,7 +1,7 @@
 package com.tradingtrends.auth.application.service;
 
 import com.tradingtrends.auth.infrastructure.client.UserClient;
-import com.tradingtrends.auth.infrastructure.client.UserResponse;
+import com.tradingtrends.auth.infrastructure.client.UserDetailsDto;
 import feign.FeignException;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
@@ -38,12 +38,12 @@ public class TokenService {
     }
 
     // Access Token 생성
-    public String createAccessToken(UserResponse user) {
+    public String createAccessToken(UserDetailsDto user) {
         return generateToken(user, accessExpiration);
     }
 
     // Refresh Token 생성
-    public String createRefreshToken(UserResponse user) {
+    public String createRefreshToken(UserDetailsDto user) {
         return generateToken(user, refreshExpiration);
     }
 
@@ -59,7 +59,7 @@ public class TokenService {
                 throw new IllegalArgumentException("유효하지 않은 Refresh Token입니다."); // 추가적인 null 체크
             }
             Integer userId = claims.getPayload().get("user_id", Integer.class);
-            UserResponse user = retrieveUser(Long.valueOf(userId)); // retrieveUser 메서드 구현 필요
+            UserDetailsDto user = retrieveUser(Long.valueOf(userId)); // retrieveUser 메서드 구현 필요
             return generateToken(user, accessExpiration);
         } catch (ExpiredJwtException e) {
             throw new IllegalStateException("Refresh Token이 만료되었습니다.");
@@ -69,9 +69,10 @@ public class TokenService {
     }
 
     // 토큰 생성
-    private String generateToken(UserResponse user, Long expirationTime) {
+    private String generateToken(UserDetailsDto user, Long expirationTime) {
         return Jwts.builder()
                 .claim("user_id", user.getUserId())
+                .claim("username", user.getUsername())
                 .claim("email", user.getEmail())
                 .claim("role", user.getRole())
                 .issuer(issuer)
@@ -82,7 +83,7 @@ public class TokenService {
     }
 
     // 토큰 파싱
-    private Jws<Claims> parseToken(final String token) {
+    public Jws<Claims> parseToken(final String token) {
         try {
             return Jwts.parser()
                     .verifyWith(secretKey)
@@ -111,9 +112,9 @@ public class TokenService {
         return Boolean.TRUE.equals(redisTemplate.hasKey(token));
     }
 
-    private UserResponse retrieveUser(Long userId) {
+    private UserDetailsDto retrieveUser(Long userId) {
         try {
-            return userClient.getUserById(userId);
+            return userClient.getUserDetailsById(userId);
         } catch (FeignException.NotFound e) {
             throw new RuntimeException("유저가 존재하지 않습니다.");
         } catch (FeignException e) {

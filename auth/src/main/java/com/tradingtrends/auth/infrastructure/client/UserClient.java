@@ -8,12 +8,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 @FeignClient(name = "user-service")
 public interface UserClient {
 
-    @GetMapping("/member/verify")
+    @GetMapping("/api/member/verify")
     Boolean verifyUser(@RequestParam(value = "user_id") Long userId);
 
-    @GetMapping("/member/id/{user_id}")
-    UserResponse getUserById(@PathVariable("user_id") Long userId);
+    @GetMapping("/api/member/{user_id}/details")
+    UserDetailsDto getUserDetailsById(@PathVariable("user_id") Long userId);
 
-    @GetMapping("/member/{username}")
-    UserResponse getUserByUsername(@PathVariable("username") String username);
+    @GetMapping("/api/member")
+    UserDetailsDto getUserDetailsByUsername(@RequestParam(value = "username") String username);
 }

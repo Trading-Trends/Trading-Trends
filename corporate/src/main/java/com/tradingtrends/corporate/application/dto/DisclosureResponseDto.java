@@ -1,6 +1,6 @@
 package com.tradingtrends.corporate.application.dto;
 
-import com.tradingtrends.corporate.domain.model.entity.DisclosureDocument;
+import com.tradingtrends.corporate.domain.model.DisclosureDocument;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

@@ -1,4 +1,10 @@
+server:
+  port: 19098
+
 spring:
+  application:
+    name: batch
+
   datasource:
     url: jdbc:postgresql://localhost:25432/tradingtrends
     username: btc
@@ -19,9 +25,6 @@ spring:
       initialize-schema: always
   elasticsearch:
     uris: 0.0.0.0:9200
-
-
-
 
 eureka:
   client:

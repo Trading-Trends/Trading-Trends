@@ -5,7 +5,7 @@ import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.tradingtrends.batch.application.dto.CorporateCodesResponseDto;
 import com.tradingtrends.batch.application.dto.DartCorporateFinanceApiResponse;
 import com.tradingtrends.batch.domain.model.CorporateCodes;
-import com.tradingtrends.batch.domain.model.CorporateMajorFinance;
+import com.tradingtrends.batch.domain.model.CorporateFinance;
 import com.tradingtrends.batch.domain.repository.CorporateFinanceRepository;
 import com.tradingtrends.batch.domain.repository.CorporatesCodesRepository;
 import java.io.ByteArrayInputStream;
@@ -14,6 +14,8 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.time.LocalDate;
+import java.time.Month;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -170,12 +172,12 @@ public class CorporateService {
 
                 if (financeDataList != null) {
                     for (DartCorporateFinanceApiResponse.CorporateFinanceDto dto : financeDataList) {
-                        Optional<CorporateMajorFinance> existingFinance = corporateFinanceRepository.findByCorpCodeAndBsnsYearAndReprtCodeAndIdxNm(
+                        Optional<CorporateFinance> existingFinance = corporateFinanceRepository.findByCorpCodeAndBsnsYearAndReprtCodeAndIdxNm(
                             dto.getCorp_code(), dto.getBsns_year(), dto.getReprt_code(), dto.getIdx_nm());
 
                         // 데이터가 존재하지 않을 경우 저장
                         if (!existingFinance.isPresent()) {
-                            corporateFinanceRepository.save(new CorporateMajorFinance(dto));
+                            corporateFinanceRepository.save(new CorporateFinance(dto));
                             financeResponseDtoList.add(dto);
                         } else {
                             log.info("Financial data for corpCode={} and year={} already exists", dto.getCorp_code(), dto.getBsns_year());
