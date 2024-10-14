@@ -44,7 +44,7 @@ spring:
         - id: market
           uri: lb://market
           predicates:
-            - Path=/api/subscription
+            - Path=/api/subscription/**
       discovery:
         locator:
           enabled: true

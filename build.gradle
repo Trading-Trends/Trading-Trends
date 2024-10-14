@@ -43,7 +43,7 @@ subprojects {
 //			compileOnly 'org.projectlombok:lombok'
 //			annotationProcessor 'org.projectlombok:lombok'
 //		}
-		if (project.name in ['batch', 'coin', 'corporate', 'notification', 'stock', 'user' ]) {
+		if (project.name in ['batch', 'coin', 'corporate', 'notification', 'stock', 'user', 'market']) {
 			implementation 'org.springframework.boot:spring-boot-starter-validation'
 //			implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
 			implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'

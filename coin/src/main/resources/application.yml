@@ -50,10 +50,10 @@ spring:
           min-idle: 0  # 최소 유휴 연결 수
           time-between-eviction-runs: 60000  # 연결 풀에서 유휴 연결을 제거할 시간 간격 (밀리초)
           max-wait: 5000  # 연결 풀에서 연결을 기다릴 최대 시간 (밀리초)
-#eureka:
-#  client:
-#    service-url:
-#      defaultZone: http://localhost:19090/eureka/
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:19090/eureka/
 
 management:
   endpoints:
