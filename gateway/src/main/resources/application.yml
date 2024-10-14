@@ -28,7 +28,7 @@ spring:
         - id: coin
           uri: lb://coin
           predicates:
-            - Path=/api/coin/**, /api/interested-coin/**, /connect-websocket, /disconnect-websocket
+            - Path=/api/coin/**, /api/interested-coin/**, /connect-websocket, /disconnect-websocket, /api/subscription/**
         - id: notification
           uri: lb://notification
           predicates:
@@ -44,7 +44,7 @@ spring:
         - id: market
           uri: lb://market
           predicates:
-            - Path=/api/subscription
+            - Path=/api/subscription, /api/subscription/**
       discovery:
         locator:
           enabled: true
