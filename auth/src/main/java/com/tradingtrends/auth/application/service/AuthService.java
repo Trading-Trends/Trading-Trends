@@ -1,9 +1,11 @@
 package com.tradingtrends.auth.application.service;
 
 import com.tradingtrends.auth.infrastructure.client.UserClient;
-import com.tradingtrends.auth.infrastructure.client.UserResponse;
+import com.tradingtrends.auth.infrastructure.client.UserDetailsDto;
 import feign.FeignException;
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.Jws;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -27,13 +29,13 @@ public class AuthService {
 
     // 로그인 시 사용자 정보 검증
     public void authenticateUser(String username, String rawPassword) {
-        UserResponse user = retrieveUserByUsername(username);
+        UserDetailsDto user = retrieveUserByUsername(username);
         validatePassword(rawPassword, user.getPassword());
     }
 
-    public UserResponse retrieveUserByUsername(final String username) throws RuntimeException {
+    public UserDetailsDto retrieveUserByUsername(final String username) throws RuntimeException {
         try {
-            return userClient.getUserByUsername(username);
+            return userClient.getUserDetailsByUsername(username);
         } catch (FeignException.NotFound e) {
             throw new RuntimeException("유저가 존재하지 않습니다.");
         } catch (FeignException e) {
@@ -47,13 +49,31 @@ public class AuthService {
         }
     }
 
-    public Boolean verifyUser(final Long userId) {
+    public Claims verifyJwt(final String token) {
         try {
-            return userClient.verifyUser(userId);
+            // 토큰이 블랙리스트에 있는지 확인
+            if (isTokenInBlacklist(token)) {
+                throw new RuntimeException("해당 토큰은 블랙리스트에 등록되어 있습니다.");
+            }
+
+            // JWT 토큰 파싱
+            Jws<Claims> jws = tokenService.parseToken(token);
+            Claims claims = jws.getPayload(); // getPayload() 대신 getBody() 사용
+            Long userId = claims.get("user_id", Long.class);
+
+            // 유저 존재 여부 확인
+            if (userClient.verifyUser(userId)) {
+                return claims; // 유효한 경우 Claims 반환
+            } else {
+                throw new RuntimeException("유저 검증에 실패하였습니다.");
+            }
+        } catch (ExpiredJwtException e) {
+            throw new RuntimeException("토큰이 만료되었습니다: " + e.getMessage());
         } catch (Exception e) {
             throw new RuntimeException("유저 검증 중 문제가 발생했습니다: " + e.getMessage());
         }
     }
+
 
     // 로그아웃 처리 및 블랙리스트에 토큰 추가
     public void logout(String accessToken, String refreshToken) {

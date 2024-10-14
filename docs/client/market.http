@@ -21,7 +21,7 @@ Content-Type: application/json
 POST http://localhost:19095/stock/connect-websocket
 Accept: application/json
 Content-Type: application/json
-approval_key: 716b31e9-da2c-4e6d-8637-47390ff75e39
+approval_key: db63144d-039a-44d5-8d45-6ac3fa7aa2e0
 custtype: P
 tr_type: 1
 
