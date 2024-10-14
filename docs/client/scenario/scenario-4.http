@@ -19,7 +19,6 @@ POST http://localhost:19091/api/auth/logout
 Content-Type: application/json
 Authorization: Bearer {Access Token}
 
-
 ### Access Token 재발급 실패
 POST http://localhost:19091/api/auth/refresh-access-token
 Content-Type: application/json
