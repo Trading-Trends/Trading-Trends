@@ -1,0 +1,51 @@
+lowercaseOutputName: true
+lowercaseOutputLabelNames: true
+rules:
+  # Collect Kafka consumer metrics
+  - pattern: "kafka.consumer<type=(.*), client-id=(.*)><>(.*)"
+    name: "kafka_consumer_$3"
+    type: GAUGE
+    labels:
+      type: "$1"
+      client_id: "$2"
+
+  # Collect Kafka producer metrics
+  - pattern: "kafka.producer<type=(.*), client-id=(.*)><>(.*)"
+    name: "kafka_producer_$3"
+    type: GAUGE
+    labels:
+      type: "$1"
+      client_id: "$2"
+
+  # Collect Kafka broker metrics
+  - pattern: "kafka.server<type=(.*), name=(.*)><>(.*)"
+    name: "kafka_server_$2_$3"
+    type: GAUGE
+    labels:
+      type: "$1"
+
+  # Collect Kafka topic metrics
+  - pattern: "kafka.log<name=(.*), topic=(.*), partition=(.*)><>(.*)"
+    name: "kafka_log_$1_$4"
+    type: GAUGE
+    labels:
+      topic: "$2"
+      partition: "$3"
+
+  # Generic JVM metrics
+  - pattern: "java.lang<type=(.*), name=(.*)><>(.*)"
+    name: "jvm_$1_$2_$3"
+    type: GAUGE
+
+  # Collect garbage collection metrics
+  - pattern: "java.lang<type=GarbageCollector, name=(.*)><>CollectionCount"
+    name: "jvm_gc_collection_count"
+    type: COUNTER
+    labels:
+      gc: "$1"
+
+  - pattern: "java.lang<type=GarbageCollector, name=(.*)><>CollectionTime"
+    name: "jvm_gc_collection_time"
+    type: GAUGE
+    labels:
+      gc: "$1"

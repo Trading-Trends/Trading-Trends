@@ -1,12 +1,9 @@
 package com.tradingtrends.market.application.service;
 
 import jakarta.annotation.PostConstruct;
-import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
@@ -18,7 +15,7 @@ import org.springframework.stereotype.Service;
 public class ClientSubscriptionService {
 
     private final RedisMessageListenerContainer redisMessageListenerContainer;
-    private final RedisSubscriberListener redisSubscriberListener;
+    private final CoinRedisSubscriberListener coinRedisSubscriberListener;
     private final RedisTemplate<String, Object> redisTemplate;
 
     @PostConstruct
@@ -28,7 +25,7 @@ public class ClientSubscriptionService {
         if (subscribedMarkets != null) {
             for (String marketKey : subscribedMarkets) {
                 String marketCode = marketKey.split(":")[1];  // "market:KRW-BTC:subscribers"에서 marketCode 추출
-                redisMessageListenerContainer.addMessageListener(redisSubscriberListener, new ChannelTopic(marketCode));
+                redisMessageListenerContainer.addMessageListener(coinRedisSubscriberListener, new ChannelTopic(marketCode));
                 log.info("Restored subscription to Redis channel for market: {}", marketCode);
             }
         }
@@ -38,6 +35,9 @@ public class ClientSubscriptionService {
      * 유저가 특정 종목(marketCode)을 구독할 때 Redis에 저장하는 로직
      * @param userId 유저 ID
      * @param marketCode 관심있는 종목 코드
+     * marketCode
+     * - coin : KRW-*
+     * - stock : ex) 000000
      */
     public void subscribeUserToMarket(String userId, String marketCode) {
         // 유저가 이미 구독 중인지 확인
@@ -49,7 +49,7 @@ public class ClientSubscriptionService {
 
         // 채널(해당 종목)이 아직 구독되지 않았을 경우에만 Redis Pub/Sub 채널 구독을 추가
         if (!Boolean.TRUE.equals(isAlreadySubscribed)) {
-            redisMessageListenerContainer.addMessageListener(redisSubscriberListener, new ChannelTopic(marketCode));
+            redisMessageListenerContainer.addMessageListener(coinRedisSubscriberListener, new ChannelTopic(marketCode));
             log.info("Subscribed to Redis channel for market: {}", marketCode);
         }
     }

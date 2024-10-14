@@ -1,0 +1,13 @@
+### 마스터 권한으로 로그인
+
+### 기업 고유번호 수집
+GET http://your-api-domain/api/data-collection/corporate-major-finance/corp-code
+Accept: application/json
+
+### 기업 주요 재무 지표 수집
+GET http://your-api-domain/api/data-collection/corporate-major-finance
+Accept: application/json
+
+### 공시 검색 정보 수집 및 공시 원본 수집
+GET http://your-api-domain/api/data-collection/disclosure?bgn_de=20230501&end_de=20230801
+Accept: application/json
