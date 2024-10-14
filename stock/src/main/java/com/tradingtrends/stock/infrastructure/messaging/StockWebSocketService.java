@@ -136,14 +136,19 @@ public class StockWebSocketService {
                 return;
             }
 
-            // 실시간 데이터 파싱 및 JSON 변환
             String jsonData = parseStockData(payload);
 
             if (jsonData != null) {
                 // 수신된 JSON 데이터를 Kafka로 전송
                 try {
+                    // JSON 데이터를 Map으로 변환
+                    Map<String, Object> parsedData = objectMapper.readValue(jsonData, Map.class);
+
+                    // Map에서 stockCode 추출
+                    String stockCode = String.valueOf(parsedData.get("stockCode"));
+
                     // Kafka로 메시지 전송 및 파티션과 오프셋 로깅 처리
-                    CompletableFuture<SendResult<String, String>> future = kafkaTemplate.send(StockTopic.STOCK_DATA.getTopic(), jsonData);
+                    CompletableFuture< SendResult<String, String>> future = kafkaTemplate.send(StockTopic.STOCK_DATA.getTopic(), stockCode, jsonData);
 
                     // 비동기적으로 Kafka 전송 결과 처리
                     future.whenComplete((result, ex) -> {

@@ -25,6 +25,6 @@ public class KafkaTopicConfig {
 
     @Bean
     public NewTopic topic1(){
-        return new NewTopic(CoinTopic.UPBIT_DATA.getTopic(), 3, (short) 2);
+        return new NewTopic(CoinTopic.UPBIT_DATA.getTopic(), 3, (short) 3);
     }
 }
