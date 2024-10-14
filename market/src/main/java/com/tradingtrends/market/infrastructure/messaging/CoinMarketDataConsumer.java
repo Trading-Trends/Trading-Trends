@@ -1,6 +1,5 @@
 package com.tradingtrends.market.infrastructure.messaging;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tradingtrends.market.infrastructure.util.CheckChannelInRedis;
 import lombok.RequiredArgsConstructor;
