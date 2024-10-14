@@ -1,0 +1,39 @@
+# 순서대로 해주세요
+
+# @name Step 1 : 유저 ID 별 수신 웹소켓 연결 - Postman WebScoket Template 이용 (scenario 3-1 테스트 진행 했으면 이미 소켓이 열러있음)
+url : ws://localhost:19100/ws/connect/coin-data-per-user?userId=1
+
+###
+
+# @name Step 2 : 유저가 원하는 종목 Redis 채널 발행
+# LG생활 건강 주식 실시간 데이터
+POST http://localhost:19100/api/subscription/subscribe/1/051900
+Content-Type: application/json
+
+###
+
+# @name Step 3 : 한국투자증권 WebSocket approvalKey 발급 API(반환 approval_key 를 아래에 넣어주기)
+GET http://localhost:19095/stock/get-approval-key
+Content-Type: application/json
+
+###
+
+## 코스피 100 : https://index.krx.co.kr/contents/MKD/03/0304/03040101/MKD03040101.jsp?upmidCd=0102&idxCd=1034&idxId=K2G02P#a110dc6b3a1678330158473e0d0ffbf0=3
+# @name Step 4 : Stock WebSocket 연결 API
+POST http://localhost:19095/stock/connect-websocket
+Accept: application/json
+Content-Type: application/json
+approval_key: d50e9878-6d91-4588-be21-ef8881ecc5a7
+custtype: P
+tr_type: 1
+
+{
+  "tr_id": "H0STCNT0",
+  "tr_key": "282330,097950,005830,383220,078930,007070,009540,267250,329180,011200,105560,030200,033780,003550,034220,051900,373220,032640,011070,066570,051910,035420,005940,005490,010950,034730,011790,302440,326030,402340,361610,096770,017670,000660,035250,010130,001570,011780,000270,024110,251270,003490,454910,241560,034020,004990,011170,138040,006800,028050,006400,028260,207940,032830,018260,009150,005930,010140,016360,029780,000810,068270,055550,002790,090430,450080,036570,066970,271560,316140,000100,035720,323410,377300,021240,259960,022100,047050,003670,086790,352820,036460,071050,015760,161390,047810,042700,008930,128940,018880,180640,009830,012450,042660,000720,086280,012330,004020,005380,008770"
+}
+
+###
+
+# @name Step 5 : Stock WebSocket 해제 API
+POST http://localhost:19095/stock/disconnect-websocket
+Content-Type: application/json
