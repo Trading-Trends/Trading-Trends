@@ -1,0 +1,22 @@
+global:
+  scrape_interval: 15s  # 데이터 수집 간격
+
+scrape_configs:
+#  - job_name: 'spring-boot-app'
+#    metrics_path: '/actuator/prometheus'
+#    static_configs:
+#      - targets:
+#          - 'localhost:19096'  # 첫 번째 Spring Boot 앱 엔드포인트
+#          - 'localhost:19010'  # 두 번째 Spring Boot 앱 엔드포인트
+
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: [ 'prometheus:9090' ]
+
+  - job_name: 'kafka-exporter'
+    static_configs:
+      - targets: ['kafka-exporter:9308']  # Kafka Exporter의 메트릭 수집
+
+  - job_name: 'kafka-jmx'
+    static_configs:
+      - targets: ['jmx-exporter:8080']  # JMX Exporter의 메트릭 수집
