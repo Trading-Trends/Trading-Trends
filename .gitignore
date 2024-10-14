@@ -37,7 +37,7 @@ out/
 .vscode/
 
 ### data ###
-#/postgres_data/**
+/postgres_data/**
 
 ### dotenv ###
 .env
