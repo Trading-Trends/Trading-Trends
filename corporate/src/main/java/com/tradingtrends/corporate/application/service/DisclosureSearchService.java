@@ -4,7 +4,7 @@ import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch.core.SearchRequest;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
 import co.elastic.clients.elasticsearch.core.search.Hit;
-import com.tradingtrends.corporate.domain.model.entity.DisclosureDocument;
+import com.tradingtrends.corporate.domain.model.DisclosureDocument;
 import com.tradingtrends.corporate.presentation.request.DisclosureSearchRequestDto;
 import com.tradingtrends.corporate.application.dto.DisclosureResponseDto;
 import lombok.RequiredArgsConstructor;

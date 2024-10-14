@@ -3,6 +3,7 @@ package com.tradingtrends.user.presentation.controller;
 
 import com.tradingtrends.user.application.dto.UserResponseDto;
 import com.tradingtrends.user.application.service.UserService;
+import com.tradingtrends.user.presentation.request.DeleteRequestDto;
 import com.tradingtrends.user.presentation.request.UserRequestDto;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -33,8 +34,8 @@ public class UserController {
 
     // 사용자 삭제 API
     @DeleteMapping("/{user_id}")
-    public ResponseEntity<String> deleteUser(@PathVariable("user_id") Long userId, @RequestParam String password) {
-        boolean isDeleted = userService.deleteUser(userId, password);
+    public ResponseEntity<String> deleteUser(@PathVariable("user_id") Long userId, @RequestBody DeleteRequestDto dto) {
+        boolean isDeleted = userService.deleteUser(userId, dto.getPassword());
         if (isDeleted) {
             return ResponseEntity.ok("사용자 삭제 성공");
         } else {
