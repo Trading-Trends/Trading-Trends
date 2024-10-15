@@ -1,0 +1,31 @@
+# @name 관심 종목 추가 API
+POST http://localhost:19095/api/interested-stock/00000A005830
+Content-Type: application/json
+
+{
+  "upperLimitPrice": 10000,
+  "lowerLimitPrice": 5000
+}
+
+###
+
+# @name 관심 종목 전체 조회 API
+GET http://localhost:19095/api/interested-stock
+Content-Type: application/json
+
+###
+
+# @name 관심 종목 수정 API
+PATCH http://localhost:19095/api/interested-stock/73de32cd-9884-449c-8ac4-8045645064ae
+Content-Type: application/json
+
+{
+  "upperLimitPrice": 15000,
+  "lowerLimitPrice": 7000
+}
+
+###
+
+# @name 관심 종목 삭제 API
+DELETE http://localhost:19095/api/interested-stock/73de32cd-9884-449c-8ac4-8045645064ae
+Content-Type: application/json
