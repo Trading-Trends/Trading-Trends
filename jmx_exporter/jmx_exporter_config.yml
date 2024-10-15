@@ -32,20 +32,21 @@ rules:
       topic: "$2"
       partition: "$3"
 
-  # Generic JVM metrics
-  - pattern: "java.lang<type=(.*), name=(.*)><>(.*)"
-    name: "jvm_$1_$2_$3"
-    type: GAUGE
+#  # Generic JVM metrics
+#  - pattern: "java.lang<type=(.*), name=(.*)><>(.*)"
+#    name: "jvm_$1_$2_$3"
+#    type: GAUGE
+#
+#  # Collect garbage collection metrics
+#  - pattern: "java.lang<type=GarbageCollector, name=(.*)><>CollectionCount"
+#    name: "jvm_gc_collection_count"
+#    type: COUNTER
+#    labels:
+#      gc: "$1"
+#
+#  - pattern: "java.lang<type=GarbageCollector, name=(.*)><>CollectionTime"
+#    name: "jvm_gc_collection_time"
+#    type: GAUGE
+#    labels:
+#      gc: "$1"
 
-  # Collect garbage collection metrics
-  - pattern: "java.lang<type=GarbageCollector, name=(.*)><>CollectionCount"
-    name: "jvm_gc_collection_count"
-    type: COUNTER
-    labels:
-      gc: "$1"
-
-  - pattern: "java.lang<type=GarbageCollector, name=(.*)><>CollectionTime"
-    name: "jvm_gc_collection_time"
-    type: GAUGE
-    labels:
-      gc: "$1"

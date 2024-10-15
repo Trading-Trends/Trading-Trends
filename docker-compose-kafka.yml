@@ -119,6 +119,8 @@ services:
     container_name: coin-zookeeper
     ports:
       - "2181:2181"
+    networks:
+      - kafka_network
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_SERVER_ID: 1
@@ -129,20 +131,30 @@ services:
     ports:
       - "9092:9092"
       - "29092:29092"
-#      - "9991:9999"  # JMX 포트 노출
+      - "7071:7071"  # JMX Exporter 포트
+    healthcheck:
+      test: [ "CMD", "bash", "-c", "printf \"\" > /dev/tcp/localhost/9092" ]
+      interval: 5s
+      timeout: 10s
+      start_period: 40s
+    networks:
+      - kafka_network
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: "coin-zookeeper:2181"
-#      KAFKA_LISTENERS: INTERNAL://0.0.0.0:9092,EXTERNAL://0.0.0.0:29092
-#      KAFKA_ADVERTISED_LISTENERS: INTERNAL://coin-kafka1:9092,EXTERNAL://coin-kafka1:29092
-#      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT
-
+#      KAFKA_LISTENERS: INTERNAL://0.0.0.0:19091,EXTERNAL://0.0.0.0:9091,DOCKER://0.0.0.0:29091
       KAFKA_ADVERTISED_LISTENERS: INTERNAL://coin-kafka1:19092,EXTERNAL://${DOCKER_HOST_IP:-127.0.0.1}:9092,DOCKER://host.docker.internal:29092
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT,DOCKER:PLAINTEXT
-
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
       KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
-      KAFKA_JMX_PORT: 9999   # JMX 포트 설정
+      JMX_PORT: 9876  # JMX 포트
+      KAFKA_OPTS: -javaagent:/usr/share/jmx_exporter/jmx_prometheus_javaagent.jar=7071:/usr/share/jmx_exporter/jmx_exporter_config.yml -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=9876 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false
+
+    volumes:
+      - ./jmx_exporter/jmx_prometheus_javaagent-1.0.1.jar:/usr/share/jmx_exporter/jmx_prometheus_javaagent.jar
+      - ./jmx_exporter/jmx_exporter_config.yml:/usr/share/jmx_exporter/jmx_exporter_config.yml
+
+
     depends_on:
       - coin-zookeeper
 
@@ -152,18 +164,27 @@ services:
     ports:
       - "9093:9093"
       - "29093:29093"
-#      - "9992:9999"  # JMX 포트 노출
+      - "7072:7072"  # JMX Exporter 포트
+    healthcheck:
+      test: [ "CMD", "bash", "-c", "printf \"\" > /dev/tcp/localhost/9093" ]
+      interval: 5s
+      timeout: 10s
+      start_period: 40s
+    networks:
+      - kafka_network
     environment:
       KAFKA_BROKER_ID: 2
       KAFKA_ZOOKEEPER_CONNECT: "coin-zookeeper:2181"
-#      KAFKA_LISTENERS: INTERNAL://0.0.0.0:9093,EXTERNAL://0.0.0.0:29093
-#      KAFKA_ADVERTISED_LISTENERS: INTERNAL://coin-kafka2:9093,EXTERNAL://coin-kafka2:29093
-#      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT
       KAFKA_ADVERTISED_LISTENERS: INTERNAL://coin-kafka2:19093,EXTERNAL://${DOCKER_HOST_IP:-127.0.0.1}:9093,DOCKER://host.docker.internal:29093
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT,DOCKER:PLAINTEXT
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
       KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
-      KAFKA_JMX_PORT: 9999   # JMX 포트 설정
+      JMX_PORT: 9877  # JMX 포트
+      KAFKA_OPTS: -javaagent:/usr/share/jmx_exporter/jmx_prometheus_javaagent.jar=7072:/usr/share/jmx_exporter/jmx_exporter_config.yml -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=9877 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false
+
+    volumes:
+      - ./jmx_exporter/jmx_prometheus_javaagent-1.0.1.jar:/usr/share/jmx_exporter/jmx_prometheus_javaagent.jar
+      - ./jmx_exporter/jmx_exporter_config.yml:/usr/share/jmx_exporter/jmx_exporter_config.yml
     depends_on:
       - coin-zookeeper
 
@@ -173,43 +194,29 @@ services:
     ports:
       - "9094:9094"
       - "29094:29094"
-#      - "9993:9999"  # JMX 포트 노출
+      - "7073:7073"  # JMX Exporter 포트
+    healthcheck:
+      test: [ "CMD", "bash", "-c", "printf \"\" > /dev/tcp/localhost/9094" ]
+      interval: 5s
+      timeout: 10s
+      start_period: 40s
+    networks:
+      - kafka_network
     environment:
       KAFKA_BROKER_ID: 3
       KAFKA_ZOOKEEPER_CONNECT: "coin-zookeeper:2181"
-#      KAFKA_LISTENERS: INTERNAL://0.0.0.0:9094,EXTERNAL://0.0.0.0:29094
-#      KAFKA_ADVERTISED_LISTENERS: INTERNAL://coin-kafka3:9094,EXTERNAL://coin-kafka3:29094
-#      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT
       KAFKA_ADVERTISED_LISTENERS: INTERNAL://coin-kafka3:19094,EXTERNAL://${DOCKER_HOST_IP:-127.0.0.1}:9094,DOCKER://host.docker.internal:29094
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT,DOCKER:PLAINTEXT
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
       KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
-      KAFKA_JMX_PORT: 9999   # JMX 포트 설정
+      JMX_PORT: 9878  # JMX 포트
+      KAFKA_OPTS: -javaagent:/usr/share/jmx_exporter/jmx_prometheus_javaagent.jar=7073:/usr/share/jmx_exporter/jmx_exporter_config.yml -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=9878 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false
+
+    volumes:
+      - ./jmx_exporter/jmx_prometheus_javaagent-1.0.1.jar:/usr/share/jmx_exporter/jmx_prometheus_javaagent.jar
+      - ./jmx_exporter/jmx_exporter_config.yml:/usr/share/jmx_exporter/jmx_exporter_config.yml
     depends_on:
       - coin-zookeeper
-
-  kafka-exporter:
-    image: danielqsj/kafka-exporter:latest
-    container_name: kafka-exporter
-    depends_on:
-      - coin-kafka1
-      - coin-kafka2
-      - coin-kafka3
-    ports:
-      - "9308:9308"  # Kafka Exporter가 Prometheus에 노출하는 메트릭 포트
-    command: ["--kafka.server=coin-kafka1:9092", "--kafka.server=coin-kafka2:9093", "--kafka.server=coin-kafka3:9094"]
-
-#  jmx-exporter:
-#    image: solsson/kafka-prometheus-jmx-exporter:latest
-#    container_name: jmx-exporter
-#    ports:
-#      - "8181:8080"  # JMX Exporter HTTP 엔드포인트 포트를 8181로 변경
-#    volumes:
-#      - ./jmx-exporter-config.yml:/opt/jmx-exporter-config.yml  # JMX Exporter 설정 파일을 마운트
-#    depends_on:
-#      - coin-kafka1
-#      - coin-kafka2
-#      - coin-kafka3
 
   kafdrop:
     image: obsidiandynamics/kafdrop:latest
@@ -220,40 +227,50 @@ services:
       - coin-kafka3
     ports:
       - "9000:9000"
+    networks:
+      - kafka_network
     environment:
       KAFKA_BROKER_CONNECT: coin-kafka1:29092,coin-kafka2:29093,coin-kafka3:29094
       JVM_OPTS: "-Xms16M -Xmx512M -Xss1M -XX:-TieredCompilation -XX:+UseStringDeduplication -noverify"
+
+  kafka-exporter:
+    image: danielqsj/kafka-exporter:latest
+    container_name: kafka-exporter
+    ports:
+      - "9308:9308"
+    command: ["--kafka.server=coin-kafka1:29092", "--kafka.server=coin-kafka2:29093", "--kafka.server=coin-kafka3:29094"]
+    networks:
+      - kafka_network
+    depends_on:
+      coin-kafka1:
+        condition: service_healthy
+      coin-kafka2:
+        condition: service_healthy
+      coin-kafka3:
+        condition: service_healthy
 
   prometheus:
     image: prom/prometheus:latest
     container_name: prometheus
     ports:
       - "9090:9090"  # Prometheus UI 접근 포트
+    networks:
+      - kafka_network
     volumes:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml  # Prometheus 설정 파일 마운트
-    depends_on:
-      - coin-kafka1
-      - coin-kafka2
-      - coin-kafka3
-#      - jmx-exporter
-      - kafka-exporter
 
   grafana:
     image: grafana/grafana:latest
     container_name: grafana
     ports:
       - "3000:3000"  # Grafana UI 접근 포트
+    networks:
+      - kafka_network
     volumes:
       - ./grafana-storage:/var/lib/grafana
     environment:
+      - GF_SECURITY_ADMIN_USER=admin
       - GF_SECURITY_ADMIN_PASSWORD=admin
-    depends_on:
-      - coin-kafka1
-      - coin-kafka2
-      - coin-kafka3
-      - kafka-exporter
-#      - jmx-exporter
-      - prometheus
 
   zipkin:
     image: openzipkin/zipkin:latest
@@ -264,6 +281,9 @@ services:
 networks:
   redis_network:
     driver: bridge
+  kafka_network:
+    driver: bridge
+
 #    ipam:
 #      config:
 #        - subnet: 172.22.0.0/16 # master, slave, sentinel**이 모두 같은 네트워크로 묶여있다면, 굳이 정적 IP 주소를 할당하지 않아도 됩니다

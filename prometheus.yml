@@ -19,4 +19,4 @@ scrape_configs:
 
   - job_name: 'kafka-jmx'
     static_configs:
-      - targets: ['jmx-exporter:8080']  # JMX Exporter의 메트릭 수집
+      - targets: ['coin-kafka1:7071', 'coin-kafka2:7072', 'coin-kafka3:7073']# JMX Exporter의 메트릭 수집
