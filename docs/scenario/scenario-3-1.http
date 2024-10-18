@@ -26,7 +26,7 @@ Content-Type: application/json
 ###
 
 # @name Step 1 : 유저 ID 별 수신 웹소켓 연결 - Postman WebScoket Template 이용, README 참고
-url : ws://localhost:19091/ws/connect/coin-data-per-user?userId=1
+url : ws://localhost:19100/ws/connect/coin-data-per-user?userId=1
 
 ###
 
