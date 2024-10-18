@@ -18,7 +18,10 @@ management:
   endpoints:
     web:
       exposure:
-        include: prometheus
+        include: "*"
+    jmx:
+      exposure:
+        include: "*"
   endpoint:
     health:
       show-details: always

@@ -47,6 +47,8 @@ services:
       - ./logstash/pipeline:/usr/share/logstash/pipeline:ro
     environment:
       LS_JAVA_OPTS: "-Xmx1g -Xms1g"
+      xpack.monitoring.enabled: "true"
+      xpack.monitoring.elasticsearch.hosts: "http://elasticsearch:9200"
     ports:
       - "5044:5044"
       - "9600:9600"
