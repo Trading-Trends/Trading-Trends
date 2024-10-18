@@ -49,7 +49,6 @@ public class TokenService {
 
     // Access Token 재발행
     public String refreshAccessToken(String refreshToken) {
-        System.out.println(refreshToken);
         if (isTokenInBlacklist(refreshToken)) {
             throw new IllegalArgumentException("유효하지 않은 Refresh Token입니다.");
         }

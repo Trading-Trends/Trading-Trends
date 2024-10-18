@@ -83,7 +83,7 @@ public class AuthController {
     private void addCookieToResponse(HttpServletResponse response, String name, String value, Long maxAgeMillis) {
         Cookie cookie = new Cookie(name, value);
         cookie.setHttpOnly(true);
-        cookie.setSecure(true); // HTTPS 사용 시만 적용
+        //cookie.setSecure(true); // HTTPS 사용 시만 적용
         cookie.setPath("/");
         cookie.setMaxAge((int) TimeUnit.MILLISECONDS.toSeconds(maxAgeMillis)); // 만료시간 설정
         response.addCookie(cookie);
@@ -93,7 +93,7 @@ public class AuthController {
     private void deleteCookieFromResponse(HttpServletResponse response, String name) {
         Cookie deleteCookie = new Cookie(name, null);
         deleteCookie.setHttpOnly(true);
-        deleteCookie.setSecure(true);
+        // deleteCookie.setSecure(true); // HTTPS 사용 시만 적용 (제거)
         deleteCookie.setPath("/");
         deleteCookie.setMaxAge(0); // 쿠키 즉시 만료
         response.addCookie(deleteCookie);
