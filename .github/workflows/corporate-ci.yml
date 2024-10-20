@@ -1,0 +1,50 @@
+name: CI/CD for Corporate Service
+
+on:
+  push:
+    paths:
+      - 'corporate/**'   # corporate 서비스 코드가 변경될 때만 트리거
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+
+      - name: make application-secret.yml
+        run: |
+          cd corporate/src/main/resources
+          # touch ./application-secret.yml
+          echo "${{ secrets.APPLICATION_PROD_CORPORATE }}" > ./application-secret.yml 
+
+      - name: Cache Gradle packages
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      - name: Build and Test Corporate Service
+        run: |
+          ./gradlew :corporate:build -x test
+
+      - name: Deploy to AWS
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        run: |
+          scp -r ./corporate ubuntu@${{ secrets.AWS_EC2_TRADING_TRENDS_DNS }}:${{ secrets.AWS_EC2_TRADINGTRENDS_PATH_CORPORATE }}
+          ssh ubuntu@${{ secrets.AWS_EC2_TRADING_TRENDS_DNS }} << EOF
+          cd ${{ secrets.AWS_EC2_TRADINGTRENDS_PATH_CORPORATE }}
+          ./gradlew bootRun &
+          EOF
