@@ -38,6 +38,7 @@ public class CoinMarketDataConsumer {
                 // 유저 구독 정보를 확인하여 필요한 종목의 데이터만 처리
                 if (checkChannelInRedis.isMarketSubscribed(marketCode)) {
                     Map<String, Object> marketData = new HashMap<>();
+                    marketData.put("marketCode", marketCode);
                     marketData.put("tradePrice", parsedData.get("tradePrice"));
                     marketData.put("signedChangePrice", parsedData.get("signedChangePrice"));
                     marketData.put("signedChangeRate", parsedData.get("signedChangeRate"));

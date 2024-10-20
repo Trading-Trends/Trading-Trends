@@ -38,8 +38,6 @@ public class WebSocketService {
         log.info("Retrieved subscribed users for market {}: {}", marketCode, subscribedUsers);
 
         if (subscribedUsers != null && !subscribedUsers.isEmpty()) {
-            message.put("marketCode", marketCode); // marketCode를 포함하여 메시지 데이터 구성
-
             for (String userId : subscribedUsers) {
                 WebSocketSession session = userSessions.get(userId);
 
