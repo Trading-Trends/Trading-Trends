@@ -16,14 +16,11 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class KafkaCleanUpService {
 
-    @Value("${spring.kafka.bootstrap-servers}")
-    private String bootstrapAddress;
-
     private final AdminClient adminClient;
 
-    public KafkaCleanUpService() {
+    public KafkaCleanUpService(@Value("${spring.kafka.bootstrap-servers}") String bootstrapAddress) {
         Properties config = new Properties();
-        config.put(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
+        config.put(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapAddress);  // 설정 파일에서 가져옴
         this.adminClient = AdminClient.create(config);
 
         // Shutdown Hook 추가
@@ -32,7 +29,6 @@ public class KafkaCleanUpService {
             cleanupKafkaTopic();
         }));
     }
-
     // Kafka 토픽을 삭제하는 메서드
     @PreDestroy
     public void cleanupKafkaTopic() {

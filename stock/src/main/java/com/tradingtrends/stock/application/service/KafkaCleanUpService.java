@@ -16,8 +16,6 @@ import java.util.concurrent.ExecutionException;
 @Service
 @Slf4j
 public class KafkaCleanUpService {
-    @Value("${spring.kafka.bootstrap-servers}")
-    private String bootstrapAddress;
 
     private final AdminClient adminClient;
 
