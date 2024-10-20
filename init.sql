@@ -21,6 +21,18 @@ GRANT ALL PRIVILEGES ON SCHEMA S_NOTIFICATION TO NTF ;
 GRANT ALL PRIVILEGES ON SCHEMA S_STOCK TO STC  ;
 GRANT ALL PRIVILEGES ON SCHEMA S_USER TO USR ;
 
+-- 배치 실행을 위한 SQL문
+-- 1. 스키마에 대한 접근 권한 부여
+GRANT USAGE ON SCHEMA public TO btc;
+-- 2. public 스키마에 있는 모든 테이블에 대해 접근 권한 부여
+GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO btc;
+-- 3. public 스키마에 있는 모든 시퀀스에 대해 접근 권한 부여 (필요시)
+GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO btc;
+-- 4. public 스키마에 새로 생성되는 테이블에 대해 자동으로 접근 권한 부여
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO btc;
+-- 5. public 스키마에 새로 생성되는 시퀀스에 대해 자동으로 접근 권한 부여 (필요시)
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT USAGE, SELECT ON SEQUENCES TO btc;
+
 /*
 GRANT ALL PRIVILEGES ON TABLE s_corporate.p_corporate_codes TO crp;
 GRANT ALL PRIVILEGES ON TABLE s_corporate.p_corporate_major_finance TO crp;
