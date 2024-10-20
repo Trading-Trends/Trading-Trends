@@ -35,9 +35,12 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
 
+      # gradlew에 실행 권한 추가
+      - name: Grant execute permission to gradlew
+        run: chmod +x ./gradlew
+      
       - name: Build and Test Corporate Service
-        run: |
-          ./gradlew :corporate:build -x test
+        run: ./gradlew :corporate:build -x test
 
       - name: Deploy to AWS
         env:
