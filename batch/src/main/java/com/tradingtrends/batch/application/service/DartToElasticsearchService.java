@@ -55,6 +55,9 @@ public class DartToElasticsearchService {
             document.setReportNm(disclosure.getReportNm());
             document.setRceptDt(disclosure.getRceptDt());
 
+            log.info("DisclosureDocumentNo: {}", document.getRceptNo());
+            log.info("DisclosureGetCorpName: {}", document.getCorpName());
+
             // ES에 인덱싱
             indexDocumentToElasticsearch(rceptNo, document);
             log.info("Data ingestion completed successfully for rceptNo: {}", rceptNo);
@@ -93,6 +96,7 @@ public class DartToElasticsearchService {
                         }
                     }
                     log.info("Extracted XML file: {}", tempXmlFile.getAbsolutePath());
+                    log.info("Extracted XML size: {}", tempXmlFile);
                     return tempXmlFile;
                 }
             }

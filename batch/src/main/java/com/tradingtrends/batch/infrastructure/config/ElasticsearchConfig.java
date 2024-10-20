@@ -39,9 +39,6 @@ public class ElasticsearchConfig{
     @Value("${elasticsearch.password}")
     private String elasticsearchPassword;
 
-    @Lazy
-    private final ElasticsearchClient elasticsearchClient;
-
     /**
      * ElasticsearchClient 빈을 생성하여 Spring 컨텍스트에 등록
      * @return ElasticsearchClient
@@ -64,64 +61,5 @@ public class ElasticsearchConfig{
         return new ElasticsearchClient(transport);
     }
 
-    /**
-     * 애플리케이션 시작 시 Elasticsearch 인덱스 설정
-     * 인덱스가 없으면 nori 분석기 설정과 함께 새로운 인덱스를 생성
-     */
-    @PostConstruct
-    public void configureElasticsearchIndex() throws IOException {
 
-        boolean indexExists = elasticsearchClient.indices().exists(e -> e.index("disclosures")).value();
-
-        if (!indexExists) {
-            createDisclosureIndex(elasticsearchClient);
-        }
-    }
-
-    /**
-     * "disclosures" 인덱스를 생성하며, nori 분석기 적용
-     * @param client ElasticsearchClient
-     * @throws IOException
-     */
-    private void createDisclosureIndex(ElasticsearchClient client) throws IOException {
-        String indexSettings = """
-            {
-              "settings": {
-                "analysis": {
-                  "analyzer": {
-                    "nori_analyzer": {
-                      "type": "custom",
-                      "tokenizer": "nori_tokenizer",
-                      "filter": ["lowercase"]
-                    }
-                  }
-                }
-              },
-              "mappings": {
-                "properties": {
-                  "corpName": {
-                    "type": "text",
-                    "analyzer": "nori_analyzer"
-                  },
-                  "reportNm": {
-                    "type": "text",
-                    "analyzer": "nori_analyzer"
-                  },
-                  "rceptDt": {
-                    "type": "date",
-                    "format": "yyyyMMdd"
-                  }
-                }
-              }
-            }
-            """;
-
-        // 인덱스 생성 요청 전송
-        client.indices().create(c -> c
-                .index("disclosures")
-                .withJson(new StringReader(indexSettings))
-        );
-
-        logger.info("Successfully created 'disclosures' index with Nori analyzer.");
-    }
 }
