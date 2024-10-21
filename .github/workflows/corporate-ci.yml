@@ -2,8 +2,8 @@ name: CI/CD for Corporate Service
 
 on:
   push:
-    paths:
-      - 'corporate/**'   # corporate 서비스 코드가 변경될 때만 트리거
+    # paths:
+    #   - 'corporate/**'   # corporate 서비스 코드가 변경될 때만 트리거
 
 jobs:
   build:
