@@ -39,7 +39,7 @@ jobs:
       - name: Grant execute permission to gradlew
         run: chmod +x ./gradlew
       
-      - name: Build and Test Corporate Service
+      - name: Build Corporate Service
         run: ./gradlew :corporate:build -x test
 
       # SH 키를 등록할 디렉토리 생성
