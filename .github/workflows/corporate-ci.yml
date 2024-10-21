@@ -42,15 +42,18 @@ jobs:
       - name: Build Corporate Service
         run: ./gradlew :corporate:build -x test
 
-      # SH 키를 등록할 디렉토리 생성
+      # .ssh 디렉토리 생성
       - name: Create .ssh directory
         run: mkdir -p ~/.ssh
 
-      # 원격 서버의 호스트 키를 등록
-      - name: Add remote server to known_hosts
-        run: ssh-keyscan -H ${{ secrets.AWS_EC2_TRADING_TRENDS_DNS }} >> ~/.ssh/known_hosts
-
-
+      # SSH 개인 키를 에이전트에 추가
+      - name: Add SSH private key
+        run: |
+          echo "${{ secrets.AWS_EC2_SERVICES_SSH_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          eval $(ssh-agent -s)
+          ssh-add ~/.ssh/id_rsa
+          
       - name: Deploy to AWS
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
