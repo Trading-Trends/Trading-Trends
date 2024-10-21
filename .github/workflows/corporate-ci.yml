@@ -68,8 +68,8 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         run: |
-          scp -r ./corporate ubuntu@${{ secrets.AWS_EC2_TRADING_TRENDS_DNS }}:${{ secrets.AWS_EC2_TRADINGTRENDS_PATH_CORPORATE }}
+          scp -r ./corporate ubuntu@${{ secrets.AWS_EC2_TRADING_TRENDS_DNS }}:/trading_trends
           ssh ubuntu@${{ secrets.AWS_EC2_TRADING_TRENDS_DNS }} << EOF
-          cd ${{ secrets.AWS_EC2_TRADINGTRENDS_PATH_CORPORATE }}
+          cd /trading_trends
           ./gradlew bootRun &
           EOF
