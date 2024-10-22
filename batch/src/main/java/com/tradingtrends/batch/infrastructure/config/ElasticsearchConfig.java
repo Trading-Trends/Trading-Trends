@@ -1,11 +1,9 @@
 package com.tradingtrends.batch.infrastructure.config;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
-import co.elastic.clients.elasticsearch.core.CreateRequest;
-import co.elastic.clients.transport.rest_client.RestClientTransport;
-import co.elastic.clients.transport.ElasticsearchTransport;
 import co.elastic.clients.json.jackson.JacksonJsonpMapper;
-import jakarta.annotation.PostConstruct;
+import co.elastic.clients.transport.ElasticsearchTransport;
+import co.elastic.clients.transport.rest_client.RestClientTransport;
 import lombok.RequiredArgsConstructor;
 import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
@@ -18,10 +16,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Lazy;
-
-import java.io.IOException;
-import java.io.StringReader;
 
 @Configuration
 @RequiredArgsConstructor
