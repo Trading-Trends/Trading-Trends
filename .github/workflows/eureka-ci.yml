@@ -6,6 +6,9 @@ on:
       - 'eureka/**'
   workflow_dispatch:  # 수동 실행을 위한 이벤트 추가
 
+permissions:  # GITHUB_TOKEN에 대한 권한 설정
+  contents: read
+  actions: write
 
 jobs:
   build:
