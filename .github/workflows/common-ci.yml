@@ -1,0 +1,28 @@
+name: CI for Eureka Module
+
+on:
+  push:
+    paths:
+      - 'common/**'
+  workflow_dispatch:  # 수동 실행을 위한 이벤트 추가
+
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Build Eureka Module
+        run: ./gradlew :common:build -x test
+
+      - name: Trigger CI for All Other Modules
+        run: |
+          curl -X POST -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+          -H "Accept: application/vnd.github.v3+json" \
+          https://api.github.com/repos/Trading-Trends/Trading-Trends/dispatches \
+          -d '{"event_type":"trigger-all-modules"}'
+
+
