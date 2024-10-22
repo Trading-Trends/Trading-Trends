@@ -19,15 +19,15 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: make application-secret.yml
-        run: |
-          cd corporate/src/main/resources
-          # touch ./application-secret.yml
-          echo "${{ secrets.APPLICATION_PROD_CORPORATE_YML }}" > ./application-secret.yml 
+      # - name: make application-secret.yml
+      #   run: |
+      #     cd corporate/src/main/resources
+      #     # touch ./application-secret.yml
+      #     echo "${{ secrets.APPLICATION_PROD_CORPORATE_YML }}" > ./application-secret.yml 
 
-      - name: Update application.yml for secrets profile
-        run: |
-          echo "${{ secrets.APPLICATION_YML }}" > ./application.yml 
+      # - name: Update application.yml for secrets profile
+      #   run: |
+      #     echo "${{ secrets.APPLICATION_YML }}" > ./application.yml 
           
       - name: Cache Gradle packages
         uses: actions/cache@v3
