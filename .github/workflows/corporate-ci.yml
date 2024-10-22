@@ -70,6 +70,15 @@ jobs:
         run: |
           scp -r ./corporate ubuntu@${{ secrets.AWS_EC2_TRADING_TRENDS_DNS }}:${{ secrets.AWS_EC2_TRADINGTRENDS_DEPLOY_PATH }}
           ssh ubuntu@${{ secrets.AWS_EC2_TRADING_TRENDS_DNS }} << EOF
+          # 19094 포트에서 실행 중인 프로세스를 확인하고 종료
+          if lsof -i :19094 -t >/dev/null; then
+            echo "Stopping existing service on port 19094..."
+            kill -9 \$(lsof -i :19094 -t)
+          else
+            echo "No service running on port 19094."
+          fi
+
+          # 새로 서비스 시작
           cd ${{ secrets.AWS_EC2_TRADINGTRENDS_DEPLOY_JAR_PATH }}
           nohup java -jar -Dspring.profiles.active=secret corporate-0.0.1-SNAPSHOT.jar &
           EOF
