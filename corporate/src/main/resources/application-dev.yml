@@ -20,9 +20,9 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
   elasticsearch:
-    uris: ${ELASTICSEARCH-ENDPOINT}
+    uris: ${ELASTICCLOUD_ENDPOINT}
     username: elastic
-    password: ${ELASTICSEARCH-PASSWORD}
+    password: ${ELASTICCLOUD_PASSWORD}
   data:
     redis:
       host: localhost
