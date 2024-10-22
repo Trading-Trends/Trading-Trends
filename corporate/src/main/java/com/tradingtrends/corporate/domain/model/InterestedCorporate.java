@@ -18,10 +18,8 @@ public class InterestedCorporate extends TimeStamped {
     @GeneratedValue
     @Column(name = "interested_corporate_id", nullable = false)
     private UUID id;
-    private Long userId;
+    private Long userId;          // 사용자 ID
     private String corpCode;      // 고유번호
-
-
 
     public InterestedCorporate(UUID id, Long userId, String corpCode, boolean isDeleted) {
         this.id = id;
