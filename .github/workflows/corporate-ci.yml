@@ -2,8 +2,8 @@ name: CI/CD for Corporate Service
 
 on:
   push:
-    # paths:
-    #   - 'corporate/**'   # corporate 서비스 코드가 변경될 때만 트리거
+    paths:
+      - 'corporate/**'   # corporate 서비스 코드가 변경될 때만 트리거
 
 jobs:
   build:
@@ -79,6 +79,6 @@ jobs:
           fi
 
           # 새로 서비스 시작
-          cd ${{ secrets.AWS_EC2_TRADINGTRENDS_DEPLOY_JAR_PATH }}
+          cd ${{ secrets.AWS_EC2_TRADINGTRENDS_DEPLOY_JAR_PATH_COPORATE }} 
           nohup java -jar -Dspring.profiles.active=secret corporate-0.0.1-SNAPSHOT.jar > /dev/null 2>&1 &
           EOF
