@@ -71,5 +71,5 @@ jobs:
           scp -r ./corporate ubuntu@${{ secrets.AWS_EC2_TRADING_TRENDS_DNS }}:${{ secrets.AWS_EC2_TRADINGTRENDS_DEPLOY_PATH }}
           ssh ubuntu@${{ secrets.AWS_EC2_TRADING_TRENDS_DNS }} << EOF
           cd ${{ secrets.AWS_EC2_TRADINGTRENDS_DEPLOY_JAR_PATH }}
-          java -jar -Dspring.profiles.active=secret corporate-0.0.1-SNAPSHOT.jar 
+          nohup java -jar -Dspring.profiles.active=secret corporate-0.0.1-SNAPSHOT.jar &
           EOF
