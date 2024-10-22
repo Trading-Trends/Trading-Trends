@@ -80,6 +80,5 @@ jobs:
 
           # 새로 서비스 시작
           cd ${{ secrets.AWS_EC2_TRADINGTRENDS_DEPLOY_JAR_PATH }}
-          nohup java -jar -Dspring.profiles.active=secret corporate-0.0.1-SNAPSHOT.jar & > /dev/null 2>&1 & disown
-          exit 0 
+          nohup java -jar -Dspring.profiles.active=secret corporate-0.0.1-SNAPSHOT.jar > /dev/null 2>&1 &
           EOF
