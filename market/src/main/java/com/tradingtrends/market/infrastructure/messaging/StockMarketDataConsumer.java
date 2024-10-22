@@ -38,6 +38,7 @@ public class StockMarketDataConsumer {
 
                 if(checkChannelInRedis.isMarketSubscribed(stockCode)){
                     Map<String, Object> stockData = new HashMap<>();
+                    stockData.put("stockCode", parsedData.get("stockCode"));
                     stockData.put("currentPrice", parsedData.get("currentPrice"));
                     stockData.put("priceChange", parsedData.get("priceChange"));
                     stockData.put("changeRate", parsedData.get("changeRate"));

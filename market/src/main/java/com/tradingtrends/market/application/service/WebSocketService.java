@@ -32,6 +32,7 @@ public class WebSocketService {
         log.info("Unregistered WebSocket session for user: {}", userId);
     }
 
+    // Redis에서 데이터를 수신 후, 유저가 해당 종목을 구독하고 있는 경우 WebSocket을 통해 데이터를 전달
     public void sendDataToSubscribedClients(String marketCode, Map<String, Object> message) {
         Set<String> subscribedUsers = getSubscribedUsers(marketCode);
         log.info("Retrieved subscribed users for market {}: {}", marketCode, subscribedUsers);
@@ -39,6 +40,7 @@ public class WebSocketService {
         if (subscribedUsers != null && !subscribedUsers.isEmpty()) {
             for (String userId : subscribedUsers) {
                 WebSocketSession session = userSessions.get(userId);
+
                 if (session != null && session.isOpen()) {
                     try {
                         session.sendMessage(new TextMessage(objectMapper.writeValueAsString(message)));
