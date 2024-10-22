@@ -4,6 +4,10 @@ on:
   push:
     paths:
       - 'coin/**'   # coin 서비스 코드가 변경될 때만 트리거
+  workflow_dispatch:  # 수동 실행을 위한 이벤트 추가
+  repository_dispatch:
+    types: [ trigger-all-modules ]  # eureka 모듈에서 트리거된 이벤트 수신
+
 
 jobs:
   build:
