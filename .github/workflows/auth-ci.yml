@@ -25,6 +25,7 @@ jobs:
 
       - name: make application-secret.yml
         run: |
+          mkdir -p auth/src/main/resources  # 경로가 없을 경우 생성
           cd auth/src/main/resources
           # touch ./application-secret.yml
           echo "${{ secrets.APPLICATION_PROD_AUTH_YML }}" > ./application-secret.yml 
