@@ -1,0 +1,84 @@
+name: CI/CD for Gateway Service
+
+on:
+  push:
+    paths:
+      - 'gateway/**'   # gateway 서비스 코드가 변경될 때만 트리거
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: make application-secret.yml
+        run: |
+          cd gateway/src/main/resources
+          # touch ./application-secret.yml
+          echo "${{ secrets.APPLICATION_PROD_GATEWAY_YML }}" > ./application-secret.yml 
+
+      - name: Update application.yml for secrets profile
+        run: |
+          echo "${{ secrets.APPLICATION_YML }}" > ./application.yml 
+          
+      - name: Cache Gradle packages
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      # gradlew에 실행 권한 추가
+      - name: Grant execute permission to gradlew
+        run: chmod +x ./gradlew
+      
+      - name: Build Gateway Service
+        run: ./gradlew :gateway:build -x test
+
+      # .ssh 디렉토리 생성
+      - name: Create .ssh directory
+        run: mkdir -p ~/.ssh
+
+      # 원격 서버의 호스트 키를 등록
+      - name: Add remote server to known_hosts
+        run: |
+          ssh-keyscan -H ${{ secrets.AWS_EC2_TRADING_TRENDS_DNS }} >> ~/.ssh/known_hosts
+
+      # SSH 개인 키를 에이전트에 추가 
+      - name: Add SSH private key
+        run: |
+          echo "${{ secrets.AWS_EC2_SERVICES_SSH_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          eval $(ssh-agent -s)
+          ssh-add ~/.ssh/id_rsa
+          
+      - name: Deploy to AWS
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        run: |
+          scp -r ./gateway ubuntu@${{ secrets.AWS_EC2_TRADING_TRENDS_DNS }}:${{ secrets.AWS_EC2_TRADINGTRENDS_DEPLOY_PATH }}
+          ssh ubuntu@${{ secrets.AWS_EC2_TRADING_TRENDS_DNS }} << EOF
+          # 19091 포트에서 실행 중인 프로세스를 확인하고 종료
+          if lsof -i :19091 -t >/dev/null; then
+            echo "Stopping existing service on port 19091..."
+            kill -9 \$(lsof -i :19091 -t)
+          else
+            echo "No service running on port 19091."
+          fi
+
+          # 새로 서비스 시작
+          cd ${{ secrets.AWS_EC2_TRADINGTRENDS_DEPLOY_JAR_PATH_GATEWAY }}
+          nohup java -jar -Dspring.profiles.active=secret gateway-0.0.1-SNAPSHOT.jar > /dev/null 2>&1 &
+          EOF
