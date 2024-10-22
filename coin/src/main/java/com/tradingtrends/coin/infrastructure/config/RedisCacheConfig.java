@@ -11,11 +11,11 @@ import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.serializer.RedisSerializationContext.SerializationPair;
 import org.springframework.data.redis.serializer.RedisSerializer;
 
-@Configuration
+//@Configuration
 @EnableCaching
 public class RedisCacheConfig {
 
-    @Bean
+//    @Bean
     public RedisCacheManager cacheManager(RedisConnectionFactory redisConnectionFactory){
         RedisCacheConfiguration configuration = RedisCacheConfiguration
             .defaultCacheConfig()

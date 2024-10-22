@@ -3,6 +3,7 @@ package com.tradingtrends.market.infrastructure.config;
 import io.lettuce.core.ReadFrom;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,20 +22,32 @@ public class RedisConfig {
 
     private final RedisProperties redisProperties;
 
-    @Bean
-    protected LettuceConnectionFactory redisConnectionFactory() {
+//    @Value("${spring.data.redis.host}")
+//    private String host;
+//
+//    @Value("${spring.data.redis.port}")
+//    private int port;
+//
+//    @Bean
+//    public RedisConnectionFactory redisConnectionFactory() {
+//        return new LettuceConnectionFactory(host, port);
+//    }
 
-        LettuceClientConfiguration clientConfig = LettuceClientConfiguration.builder()
-            .readFrom(ReadFrom.REPLICA_PREFERRED)
-            .build();
 
-        RedisSentinelConfiguration sentinelConfig = new RedisSentinelConfiguration()
-            .master(redisProperties.getSentinel().getMaster());
-
-        redisProperties.getSentinel().getNodes().forEach(s -> sentinelConfig.sentinel(s.split(":")[0],Integer.valueOf(s.split(":")[1])));
-//        sentinelConfig.setPassword(RedisPassword.of(redisProperties.getPassword()));
-        return new LettuceConnectionFactory(sentinelConfig, clientConfig);
-    }
+//    @Bean
+//    protected LettuceConnectionFactory redisConnectionFactory() {
+//
+//        LettuceClientConfiguration clientConfig = LettuceClientConfiguration.builder()
+//            .readFrom(ReadFrom.REPLICA_PREFERRED)
+//            .build();
+//
+//        RedisSentinelConfiguration sentinelConfig = new RedisSentinelConfiguration()
+//            .master(redisProperties.getSentinel().getMaster());
+//
+//        redisProperties.getSentinel().getNodes().forEach(s -> sentinelConfig.sentinel(s.split(":")[0],Integer.valueOf(s.split(":")[1])));
+////        sentinelConfig.setPassword(RedisPassword.of(redisProperties.getPassword()));
+//        return new LettuceConnectionFactory(sentinelConfig, clientConfig);
+//    }
 
     /**
      * RedisTemplate 을 통해 Redis와 상호작용

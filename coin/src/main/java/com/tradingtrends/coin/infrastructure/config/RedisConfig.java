@@ -3,6 +3,7 @@ package com.tradingtrends.coin.infrastructure.config;
 import io.lettuce.core.ReadFrom;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -22,23 +23,37 @@ public class RedisConfig {
 
     private final RedisProperties redisProperties;
 
+//    @Value("${spring.data.redis.host}")
+//    private String host;
+//
+//    @Value("${spring.data.redis.port}")
+//    private int port;
+//
+//    @Bean
+//    public RedisConnectionFactory redisConnectionFactory() {
+//        return new LettuceConnectionFactory(host, port);
+//    }
+
+
     /**
      * Redis Sentinel 구조에서 다음과 같은 LettuceConnectionFactory 설정을 사용하는 이유는 Redis Sentinel의 고가용성(HA) 및 자동 장애 조치 기능을 지원
      * Sentinel과 연동하여, Redis Sentinel 클러스터가 마스터-슬레이브 구조를 자동으로 관리할 수 있도록 설정
      */
-    @Bean
-    protected LettuceConnectionFactory redisConnectionFactory() {
+//    @Bean
+//    protected LettuceConnectionFactory redisConnectionFactory() {
+//
+//        LettuceClientConfiguration clientConfig = LettuceClientConfiguration.builder()
+//            .readFrom(ReadFrom.REPLICA_PREFERRED)
+//            .build();
+//
+//        RedisSentinelConfiguration sentinelConfig = new RedisSentinelConfiguration()
+//            .master(redisProperties.getSentinel().getMaster());
+//
+//        redisProperties.getSentinel().getNodes().forEach(s -> sentinelConfig.sentinel(s.split(":")[0],Integer.valueOf(s.split(":")[1])));
+//        return new LettuceConnectionFactory(sentinelConfig, clientConfig);
+//    }
 
-        LettuceClientConfiguration clientConfig = LettuceClientConfiguration.builder()
-            .readFrom(ReadFrom.REPLICA_PREFERRED)
-            .build();
 
-        RedisSentinelConfiguration sentinelConfig = new RedisSentinelConfiguration()
-            .master(redisProperties.getSentinel().getMaster());
-
-        redisProperties.getSentinel().getNodes().forEach(s -> sentinelConfig.sentinel(s.split(":")[0],Integer.valueOf(s.split(":")[1])));
-        return new LettuceConnectionFactory(sentinelConfig, clientConfig);
-    }
 
     /**
      * RedisTemplate 을 통해 Redis와 상호작용
