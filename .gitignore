@@ -44,4 +44,3 @@ out/
 .env.dev
 .env.**
 
-application.yml

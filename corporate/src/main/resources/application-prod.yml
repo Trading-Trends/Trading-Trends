@@ -6,9 +6,9 @@ spring:
     name: corporate
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/corpoate
+    url: ${CRP_POSTGRES_URL}
     username: crp
-    password: 1234
+    password: ${CRP_POSTGRES_PASSWORD}
     driver-class-name: org.postgresql.Driver
 
   jpa:
@@ -20,18 +20,18 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
   elasticsearch:
-    uris: ${ELASTICSEARCH-ENDPOINT}
+    uris: ${ELASTICCLOUD_ENDPOINT}
     username: elastic
-    password: ${ELASTICSEARCH-PASSWORD}
+    password: ${ELASTICCLOUD_PASSWORD}
   data:
     redis:
-      host: localhost
+      host: ${ELASTICACHE_REDIS_HOST}
       port: 6379
 
 eureka:
   client:
     service-url:
-      defaultZone: http://localhost:19090/eureka/
+      defaultZone: ${EUREKA_SERVER_URL}
 
 logging:
   file:
