@@ -6,6 +6,9 @@ on:
       - 'eureka/**'
   workflow_dispatch:  # 수동 실행을 위한 이벤트 추가
 
+permissions:  # GITHUB_TOKEN에 대한 권한 설정
+  contents: read
+  actions: write
 
 jobs:
   build:
@@ -23,6 +26,7 @@ jobs:
 
       - name: make application-secret.yml
         run: |
+          mkdir -p eureka/src/main/resources  # 경로가 없을 경우 생성
           cd eureka/src/main/resources
           # touch ./application-secret.yml
           echo "${{ secrets.APPLICATION_PROD_EUREKA_YML }}" > ./application-secret.yml 
@@ -87,7 +91,7 @@ jobs:
 
       - name: Trigger CI for All Other Modules
         run: |
-          curl -X POST -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+          curl -X POST -H "Authorization: token ${{ secrets.PERSONAL_ACCESS_TOKEN }}" \
           -H "Accept: application/vnd.github.v3+json" \
           https://api.github.com/repos/Trading-Trends/Trading-Trends/dispatches \
           -d '{"event_type":"trigger-all-modules"}'

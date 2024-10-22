@@ -1,14 +1,12 @@
-name: CI/CD for Auth Service
+name: CI/CD for Batch Service
 
 on:
   push:
     paths:
-      - 'auth/**'   # auth 서비스 코드가 변경될 때만 트리거
+      - 'batch/**'   # batch 서비스 코드가 변경될 때만 트리거
   workflow_dispatch:  # 수동 실행을 위한 이벤트 추가
   repository_dispatch:
     types: [ trigger-all-modules ]  # eureka 모듈에서 트리거된 이벤트 수신
-
-
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -25,10 +23,10 @@ jobs:
 
       - name: make application-secret.yml
         run: |
-          mkdir -p auth/src/main/resources  # 경로가 없을 경우 생성
-          cd auth/src/main/resources
+          mkdir -p batch/src/main/resources  # 경로가 없을 경우 생성
+          cd batch/src/main/resources
           # touch ./application-secret.yml
-          echo "${{ secrets.APPLICATION_PROD_AUTH_YML }}" > ./application-secret.yml 
+          echo "${{ secrets.APPLICATION_PROD_BATCH_YML }}" > ./application-secret.yml 
 
       - name: Update application.yml for secrets profile
         run: |
@@ -48,8 +46,8 @@ jobs:
       - name: Grant execute permission to gradlew
         run: chmod +x ./gradlew
       
-      - name: Build Auth Service
-        run: ./gradlew :auth:build -x test
+      - name: Build Batch Service
+        run: ./gradlew :batch:build -x test
 
       # .ssh 디렉토리 생성
       - name: Create .ssh directory
@@ -73,17 +71,17 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         run: |
-          scp -r ./auth ubuntu@${{ secrets.AWS_EC2_TRADING_TRENDS_DNS }}:${{ secrets.AWS_EC2_TRADINGTRENDS_DEPLOY_PATH }}
+          scp -r ./batch ubuntu@${{ secrets.AWS_EC2_TRADING_TRENDS_DNS }}:${{ secrets.AWS_EC2_TRADINGTRENDS_DEPLOY_PATH }}
           ssh ubuntu@${{ secrets.AWS_EC2_TRADING_TRENDS_DNS }} << EOF
-          # 19092 포트에서 실행 중인 프로세스를 확인하고 종료
-          if lsof -i :19092 -t >/dev/null; then
-            echo "Stopping existing service on port 19092..."
-            kill -9 \$(lsof -i :19092 -t)
+          # 19098 포트에서 실행 중인 프로세스를 확인하고 종료
+          if lsof -i :19098 -t >/dev/null; then
+            echo "Stopping existing service on port 19098..."
+            kill -9 \$(lsof -i :19098 -t)
           else
-            echo "No service running on port 19092."
+            echo "No service running on port 19098."
           fi
 
           # 새로 서비스 시작
-          cd ${{ secrets.AWS_EC2_TRADINGTRENDS_DEPLOY_JAR_PATH_AUTH }}
-          nohup java -jar -Dspring.profiles.active=secret auth-0.0.1-SNAPSHOT.jar > /dev/null 2>&1 &
+          cd ${{ secrets.AWS_EC2_TRADINGTRENDS_DEPLOY_JAR_PATH_BATCH }}
+          nohup java -jar -Dspring.profiles.active=secret batch-0.0.1-SNAPSHOT.jar > /dev/null 2>&1 &
           EOF
