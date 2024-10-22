@@ -1,4 +1,4 @@
-name: CI for Eureka Module
+name: CI for Common Module
 
 on:
   push:
