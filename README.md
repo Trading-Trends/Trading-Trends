@@ -79,7 +79,8 @@
 
 <details>
 <summary><strong>기업 정보 제공 기능</strong></summary>
-<img src="https://github.com/user-attachments/assets/87ce504b-4bf2-4bfc-8cc1-cb86e9727700" alt="기업 재무 및 공시 자료 수집" />
+<img src="https://github.com/user-attachments/assets/f1559456-dbc6-4d1e-a98d-1fd94b27dbf0" alt="기업 재무 및 공시 자료 수집" />
+
   
 - 매일 오전 4시 기업 고유 번호, 기업 주요 재무 지표 수집/적재
 - 매일 오전 5시 공시 검색 데이터, 공시 자료 원본 수집/적재
