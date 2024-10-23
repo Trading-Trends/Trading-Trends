@@ -9,7 +9,7 @@
 |ERD|[🔗Link](https://www.erdcloud.com/d/RvPEp4mEbrSbEakdc)|
 |API 명세서|[🔗Link](https://horse-giver-fbd.notion.site/API-fff2ebde9ffc8110b0d5f1328b0a50d5)|
 |API 시나리오 명세서|[🔗Link](https://horse-giver-fbd.notion.site/API-11f2ebde9ffc8044987af100431c263c)|
-|배포 링크|[🔗Link](ec2-43-203-146-138.ap-northeast-2.compute.amazonaws.com)|
+|배포 링크|http://ec2-43-203-146-138.ap-northeast-2.compute.amazonaws.com:19090|
 
 <br/><br/>
 
@@ -174,7 +174,7 @@
 
 </details>
 
-<br/><br/><br/>
+<br/><br/>
 
 ## ❓ 기술적 의사결정
 - [기술적 의사결정](https://horse-giver-fbd.notion.site/1262ebde9ffc8081a042c7185420bff8)
