@@ -62,7 +62,17 @@ public class DartDisclosureService {
             JsonNode resultNode = rootNode.path("list");
 
             for (JsonNode item : resultNode) {
+
+                String rceptNo = item.path("rcept_no").asText();
+
+                // 이미 존재하는 rcept_no는 스킵
+                if (disclosureRepository.existsByRceptNo(rceptNo)) {
+                    log.info("Already exists rcept_no: " + rceptNo);
+                    continue;  // 이미 존재하는 경우 다음 항목으로 넘어감
+                }
+
                 Disclosure entity = new Disclosure();
+
                 entity.setRceptNo(item.path("rcept_no").asText());
                 entity.setCorpName(item.path("corp_name").asText());
                 entity.setCorpCode(item.path("corp_code").asText());

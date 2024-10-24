@@ -19,4 +19,5 @@ public interface DisclosureRepository extends JpaRepository<Disclosure, UUID> {
     @Query("SELECT d.rceptNo FROM Disclosure d WHERE d.loadDt BETWEEN :startDate AND :endDate")
     List<String> findRceptNoByLoadDtBetween(@Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate);
 
+    boolean existsByRceptNo(String rceptNo);
 }
