@@ -1,6 +1,8 @@
 # 📈 Trading Trends
 ![Trading Trends 2000](https://github.com/user-attachments/assets/42402f76-533b-4dc1-a75e-1b37aee378f0)
 
+![image (14)](https://github.com/user-attachments/assets/9cf6c86e-7d54-41dc-9752-3f3d6bbb4943)
+
 |분류|내용|
 |---|---|
 |주제|주식/코인 인사이트 플랫폼|
